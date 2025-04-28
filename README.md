@@ -1,1 +1,1 @@
-# EcoPulse
+🌱 Welcome to EcoPulse — your personal guide to greener living! Track your eco-actions, earn points and badges, join challenges, and see your positive impact grow. Let's make sustainability fun and rewarding! 🚀
