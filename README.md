@@ -1,4 +1,4 @@
-# EcoPulse 🌱
+# 🌱 Eco Pulse: Personal Sustainable Tracker
 
 Welcome to **EcoPulse** — your personal guide to greener living!  
 Track your eco-actions, earn points and badges, join challenges, and see your positive impact grow. Let's make sustainability fun and rewarding! 🚀
@@ -86,12 +86,6 @@ ecopulse/
 - Global eco-challenges between users
 - AI chatbot upgrade with OpenAI fine-tuning
 - Admin dashboard for challenge management
-
----
-
-## 🤝 Team
-- Tarakanta Acharya – Frontend Developer
-- Vasupriya Patnaik Balivada – Backend Developer
 
 ---
 
