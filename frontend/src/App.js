@@ -1,23 +1,39 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LandingPage from "./pages/LandingPage";
-import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Navbar from "./components/Navbar"; 
-import Footer from "./components/Footer"; 
+import { lazy, Suspense } from 'react';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import HowItWorks from "./pages/HowItWorks";
+import Community from "./pages/Community";
+import About from "./pages/About";
+//import LoadingSpinner from "./components/LoadingSpinner";
+
+// Lazy load pages for better performance
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 text-gray-900">
-        <Routes>
-          <Route path="/navbar" element={<Navbar />} />
-          <Route path="/footer" element={<Footer />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        
+        <main className="flex-1">
+          <Suspense>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
+          </Suspense>
+        </main>
+        
+        <Footer />
       </div>
     </Router>
   );
