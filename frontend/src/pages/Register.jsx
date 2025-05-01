@@ -1,140 +1,227 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-// import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"; // Uncomment if using Firebase
-// import { auth } from "../firebase"; // your Firebase config
+import Link from "next/link";
+import { useState } from "react";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
-export default function Register() {
-  const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
-  const [errors, setErrors] = useState({});
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!form.name.trim()) newErrors.name = "Name is required";
-    if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "Enter a valid email";
-    if (form.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    if (form.confirmPassword !== form.password)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+export default function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
-
-    console.log("Form submitted:", form);
-    navigate("/dashboard");
-  };
-
-  // Google Sign-In logic placeholder
-  const handleGoogleSignIn = () => {
-    console.log("Google sign-in clicked");
-    // Firebase example (if using Firebase):
-    // const provider = new GoogleAuthProvider();
-    // signInWithPopup(auth, provider)
-    //   .then((result) => {
-    //     console.log(result.user);
-    //     navigate("/dashboard");
-    //   })
-    //   .catch((error) => console.error(error));
+    setIsLoading(true);
+    // Registration logic here
+    setTimeout(() => setIsLoading(false), 2000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-green-200 px-4">
-      <motion.div
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm"
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h2 className="text-3xl font-extrabold text-center text-green-700 mb-6">Register</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Name"
-              className={`w-full px-4 py-2 border rounded focus:outline-none ${
-                errors.name ? "border-red-500" : "border-gray-300"
-              }`}
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-          </div>
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              className={`w-full px-4 py-2 border rounded focus:outline-none ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-          </div>
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              className={`w-full px-4 py-2 border rounded focus:outline-none ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-          </div>
-          <div>
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              className={`w-full px-4 py-2 border rounded focus:outline-none ${
-                errors.confirmPassword ? "border-red-500" : "border-gray-300"
-              }`}
-              value={form.confirmPassword}
-              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-            />
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded font-semibold hover:bg-green-700 transition"
-          >
-            Register
-          </button>
-        </form>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-teal-900 flex items-center justify-center p-4">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-teal-500/10"
+            initial={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              width: Math.random() * 15 + 5,
+              height: Math.random() * 15 + 5,
+            }}
+            animate={{
+              x: [null, Math.random() * 100 - 50],
+              y: [null, Math.random() * 100 - 50],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+        ))}
+      </div>
 
-        <div className="mt-4 text-center">
-          <p className="text-gray-600 text-sm">or</p>
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full mt-2 flex items-center justify-center border border-gray-300 rounded py-2 hover:bg-gray-100 transition"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/50 shadow-xl"
+      >
+        {/* Header */}
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-center">
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-20 h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
           >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="Google"
-              className="h-5 w-5 mr-2"
-            />
-            Continue with Google
-          </button>
+            <span className="text-3xl">🌍</span>
+          </motion.div>
+          <h1 className="text-2xl font-bold text-white mt-4">Join EcoPulse</h1>
+          <p className="text-teal-100">Create your sustainable journey</p>
         </div>
 
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Already have an account?{" "}
-          <span
-            className="text-green-700 hover:underline cursor-pointer font-medium"
-            onClick={() => navigate("/login")}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
           >
-            Login
-          </span>
-        </p>
+            <label className="block text-gray-300 mb-2">Full Name</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiUser className="text-gray-500" />
+              </div>
+              <input
+                type="text"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                placeholder="Your name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <label className="block text-gray-300 mb-2">Email</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiMail className="text-gray-500" />
+              </div>
+              <input
+                type="email"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                placeholder="your@email.com"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
+              />
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <label className="block text-gray-300 mb-2">Password</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiLock className="text-gray-500" />
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="w-full pl-10 pr-12 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
+                ) : (
+                  <FiEye className="text-gray-400 hover:text-emerald-400" />
+                )}
+              </button>
+            </div>
+            <div className="text-xs text-gray-500 mt-2">
+              Minimum 8 characters with at least one number
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex items-center"
+          >
+            <input
+              type="checkbox"
+              id="terms"
+              className="w-4 h-4 text-emerald-600 bg-gray-700 rounded border-gray-600 focus:ring-emerald-500"
+              required
+            />
+            <label htmlFor="terms" className="ml-2 text-sm text-gray-300">
+              I agree to the{" "}
+              <Link href="/terms" className="text-emerald-400 hover:underline">
+                Terms & Conditions
+              </Link>
+            </label>
+          </motion.div>
+
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            disabled={isLoading}
+            className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+              isLoading
+                ? "bg-teal-700 cursor-not-allowed"
+                : "bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700"
+            } text-white shadow-lg`}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Creating account...
+              </span>
+            ) : (
+              "Create Account"
+            )}
+          </motion.button>
+        </form>
+
+        {/* Footer */}
+        <div className="px-6 pb-6 text-center">
+          <p className="text-gray-400">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-teal-400 hover:text-teal-300 font-medium"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
       </motion.div>
     </div>
   );
