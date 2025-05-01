@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -163,7 +163,7 @@ export default function RegisterPage() {
             />
             <label htmlFor="terms" className="ml-2 text-sm text-gray-300">
               I agree to the{" "}
-              <Link href="/terms" className="text-emerald-400 hover:underline">
+              <Link to="/terms" className="text-emerald-400 hover:underline">
                 Terms & Conditions
               </Link>
             </label>
@@ -215,7 +215,7 @@ export default function RegisterPage() {
           <p className="text-gray-400">
             Already have an account?{" "}
             <Link
-              href="/login"
+              to="/login"
               className="text-teal-400 hover:text-teal-300 font-medium"
             >
               Sign in
