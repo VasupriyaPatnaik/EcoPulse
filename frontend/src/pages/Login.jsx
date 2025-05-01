@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
@@ -122,7 +122,7 @@ export default function LoginPage() {
             </div>
             <div className="flex justify-end mt-2">
               <Link
-                href="/forgot-password"
+                to="/forgot-password"
                 className="text-sm text-emerald-400 hover:text-emerald-300"
               >
                 Forgot password?
@@ -176,7 +176,7 @@ export default function LoginPage() {
           <p className="text-gray-400">
             Don't have an account?{" "}
             <Link
-              href="/register"
+              to="/register"
               className="text-emerald-400 hover:text-emerald-300 font-medium"
             >
               Sign up
