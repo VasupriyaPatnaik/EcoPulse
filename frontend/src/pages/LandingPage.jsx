@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Spline from "@splinetool/react-spline";
+import { Application } from "@splinetool/runtime"; // Using runtime instead of react-spline
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar";
@@ -13,8 +13,12 @@ export default function LandingPage() {
   const [showChatbot, setShowChatbot] = useState(false);
   const [voicePlayed, setVoicePlayed] = useState(false);
   const [ecoFact, setEcoFact] = useState("");
+  const [splineLoaded, setSplineLoaded] = useState(false);
+  const [splineError, setSplineError] = useState(false);
   const statsRef = useRef(null);
   const canvasRef = useRef(null);
+  const splineCanvasRef = useRef(null);
+  const splineInstance = useRef(null);
 
   // Voice greeting
   const speak = (text) => {
@@ -27,9 +31,42 @@ export default function LandingPage() {
     }
   };
 
+  // Load Spline scene
+  useEffect(() => {
+    const loadSpline = async () => {
+      try {
+        if (!splineCanvasRef.current) return;
+
+        splineInstance.current = new Application(splineCanvasRef.current);
+        await splineInstance.current.load(
+          "https://prod.spline.design/6Wq1Q7YGyM-bJ6f5/scene.splinecode",
+          {
+            credentials: "include",
+            mode: "no-cors",
+          }
+        );
+        setSplineLoaded(true);
+        speak("Welcome to EcoPulse! Let's save the planet together!");
+      } catch (error) {
+        console.error("Spline loading error:", error);
+        setSplineError(true);
+      }
+    };
+
+    loadSpline();
+
+    return () => {
+      if (splineInstance.current) {
+        splineInstance.current.dispose();
+      }
+    };
+  }, []);
+
   // Animate stats counter
   useEffect(() => {
-    const stats = statsRef.current.children;
+    const stats = statsRef.current?.children;
+    if (!stats) return;
+
     gsap.from(stats, {
       duration: 1.5,
       y: 50,
@@ -131,14 +168,40 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
-        {/* 3D Animated Mascot */}
+        {/* 3D Animated Mascot with fallback */}
         <div className="absolute right-5 lg:right-10 top-1/2 -translate-y-1/2 w-full max-w-xl h-[400px] lg:h-[600px]">
-          <Spline
-            scene="https://prod.spline.design/6Wq1Q7YGyM-bJ6f5/scene.splinecode"
-            onLoad={() => speak("Welcome to EcoPulse! Let's save the planet together!")}
-          />
+          {!splineError ? (
+            <>
+              <canvas
+                ref={splineCanvasRef}
+                className={`w-full h-full ${
+                  splineLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                style={{ transition: "opacity 0.5s ease-out" }}
+              />
+              {!splineLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800/50">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                </div>
+              )}
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-full h-full flex items-center justify-center"
+            >
+              <img
+                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcW0xN2R2a3F5b3l5b2V6dGJ0dWJ6eHZ1b2R4eWZ4cXJ4d3N1eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsQ8UQ1h4LhG1i/giphy.gif"
+                alt="Eco mascot"
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          )}
         </div>
 
+        {/* Rest of your content remains exactly the same */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,8 +224,13 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 1 }}
           >
-            Transform your eco-actions into <span className="font-semibold text-white">real impact</span> with our{" "}
-            <span className="font-semibold text-emerald-300">AI-powered sustainability tracker</span>.
+            Transform your eco-actions into{" "}
+            <span className="font-semibold text-white">real impact</span> with
+            our{" "}
+            <span className="font-semibold text-emerald-300">
+              AI-powered sustainability tracker
+            </span>
+            .
           </motion.p>
 
           <motion.div
@@ -174,9 +242,9 @@ export default function LandingPage() {
             <motion.a
               href="/dashboard"
               className="relative px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-emerald-400/30 transition-all duration-300 overflow-hidden group"
-              whileHover={{ 
+              whileHover={{
                 scale: 1.05,
-                boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.5)"
+                boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.5)",
               }}
               whileTap={{ scale: 0.98 }}
             >
@@ -238,9 +306,15 @@ export default function LandingPage() {
                 whileHover={{ y: -10 }}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className={`text-5xl mb-4 ${feature.color}`}>{feature.icon}</div>
-                <h3 className="text-2xl font-bold mb-3 text-white">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                <div className={`text-5xl mb-4 ${feature.color}`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-white">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-300 leading-relaxed">
+                  {feature.description}
+                </p>
                 <div className="mt-6 h-1 w-20 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full" />
               </motion.div>
             ))}
