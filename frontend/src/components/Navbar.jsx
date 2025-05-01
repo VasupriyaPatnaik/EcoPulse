@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
@@ -26,8 +26,8 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* Logo with eco pulse effect */}
-          <Link href="/">
+          {/* Logo */}
+          <Link to="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -64,7 +64,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
-                  href={`#${item.toLowerCase()}`}
+                  to={`#${item.toLowerCase()}`}
                   className="text-gray-300 hover:text-emerald-300 transition-colors font-medium"
                 >
                   {item}
