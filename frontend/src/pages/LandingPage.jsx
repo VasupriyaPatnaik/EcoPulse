@@ -1,16 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Application } from "@splinetool/runtime"; // Using runtime instead of react-spline
+import { Application } from "@splinetool/runtime";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import EcoMascot from "../components/EcoMascot";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
   const [showChatbot, setShowChatbot] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState("login"); // 'login' or 'signup'
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+  });
+  const [authError, setAuthError] = useState("");
   const [voicePlayed, setVoicePlayed] = useState(false);
   const [ecoFact, setEcoFact] = useState("");
   const [splineLoaded, setSplineLoaded] = useState(false);
@@ -19,6 +28,23 @@ export default function LandingPage() {
   const canvasRef = useRef(null);
   const splineCanvasRef = useRef(null);
   const splineInstance = useRef(null);
+  const authModalRef = useRef(null);
+
+  // Handle click outside auth modal
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        authModalRef.current &&
+        !authModalRef.current.contains(event.target)
+      ) {
+        setShowAuthModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Voice greeting
   const speak = (text) => {
@@ -134,6 +160,61 @@ export default function LandingPage() {
     }
   }, []);
 
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError("");
+
+    // Basic validation
+    if (!formData.email || !formData.password) {
+      setAuthError("Email and password are required");
+      return;
+    }
+
+    if (authMode === "signup" && !formData.name) {
+      setAuthError("Name is required for signup");
+      return;
+    }
+
+    try {
+      // Here you would typically make an API call to your backend
+      // For demo purposes, we'll just simulate a successful login
+      console.log(`${authMode} attempt with:`, formData);
+
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // For demo, just close the modal and show success
+      setShowAuthModal(false);
+      speak(
+        authMode === "login"
+          ? "Welcome back to EcoPulse!"
+          : "Account created successfully! Welcome to EcoPulse!"
+      );
+
+      // Reset form
+      setFormData({
+        email: "",
+        password: "",
+        name: "",
+      });
+    } catch (error) {
+      setAuthError(error.message || "Authentication failed. Please try again.");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const toggleAuthMode = () => {
+    setAuthMode((prev) => (prev === "login" ? "signup" : "login"));
+    setAuthError("");
+  };
+
   // Features data
   const features = [
     {
@@ -164,7 +245,151 @@ export default function LandingPage() {
         className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
       />
 
-      <Navbar />
+      <Navbar
+        onLoginClick={() => {
+          setAuthMode("login");
+          setShowAuthModal(true);
+        }}
+        isAuthenticated={false} // Set this based on your auth state
+      />
+      <EcoMascot />
+
+      {/* Auth Modal */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              ref={authModalRef}
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-2xl overflow-hidden border border-emerald-400/30 w-full max-w-md"
+            >
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-5 text-white text-center">
+                <h2 className="text-2xl font-bold">
+                  {authMode === "login" ? "Welcome Back" : "Join EcoPulse"}
+                </h2>
+                <p className="text-sm opacity-80 mt-1">
+                  {authMode === "login"
+                    ? "Log in to track your eco-impact"
+                    : "Create an account to start your journey"}
+                </p>
+              </div>
+
+              <form onSubmit={handleAuthSubmit} className="p-6">
+                {authMode === "signup" && (
+                  <div className="mb-4">
+                    <label
+                      className="block text-gray-300 text-sm mb-2"
+                      htmlFor="name"
+                    >
+                      Full Name
+                    </label>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      placeholder="Jane Doe"
+                    />
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label
+                    className="block text-gray-300 text-sm mb-2"
+                    htmlFor="email"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label
+                    className="block text-gray-300 text-sm mb-2"
+                    htmlFor="password"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-700/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    placeholder={
+                      authMode === "login"
+                        ? "••••••••"
+                        : "At least 8 characters"
+                    }
+                  />
+                </div>
+
+                {authError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-red-900/50 text-red-200 rounded-lg text-sm"
+                  >
+                    {authError}
+                  </motion.div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 mb-4"
+                >
+                  {authMode === "login" ? "Log In" : "Sign Up"}
+                </button>
+
+                <div className="text-center text-sm text-gray-400">
+                  {authMode === "login" ? (
+                    <>
+                      Don't have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={toggleAuthMode}
+                        className="text-emerald-400 hover:text-emerald-300 font-medium"
+                      >
+                        Sign up
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      Already have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={toggleAuthMode}
+                        className="text-emerald-400 hover:text-emerald-300 font-medium"
+                      >
+                        Log in
+                      </button>
+                    </>
+                  )}
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
@@ -201,7 +426,6 @@ export default function LandingPage() {
           )}
         </div>
 
-        {/* Rest of your content remains exactly the same */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -239,8 +463,11 @@ export default function LandingPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 1 }}
           >
-            <motion.a
-              href="/dashboard"
+            <motion.button
+              onClick={() => {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              }}
               className="relative px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-emerald-400/30 transition-all duration-300 overflow-hidden group"
               whileHover={{
                 scale: 1.05,
@@ -252,7 +479,7 @@ export default function LandingPage() {
                 Get Started <span className="text-xl">🚀</span>
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </motion.a>
+            </motion.button>
 
             <motion.button
               onClick={() => setShowChatbot(true)}
