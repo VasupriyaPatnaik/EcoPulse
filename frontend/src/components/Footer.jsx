@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const ecoLinks = [
@@ -76,7 +76,7 @@ export default function Footer() {
                 {column.links.map((link) => (
                   <li key={link}>
                     <Link
-                      href="#"
+                      to="#"
                       className="text-gray-400 hover:text-emerald-300 transition-colors"
                     >
                       {link}
@@ -129,19 +129,19 @@ export default function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="#"
+              to="#"
               className="text-gray-500 hover:text-emerald-300 text-sm transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
-              href="#"
+              to="#"
               className="text-gray-500 hover:text-emerald-300 text-sm transition-colors"
             >
               Terms of Service
             </Link>
             <Link
-              href="#"
+              to="#"
               className="text-gray-500 hover:text-emerald-300 text-sm transition-colors"
             >
               Cookies
