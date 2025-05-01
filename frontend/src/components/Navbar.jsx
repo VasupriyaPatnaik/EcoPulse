@@ -14,7 +14,13 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = ["Features", "Dashboard", "Leaderboard", "About"];
+  // Updated navigation items with proper routes
+  const navItems = [
+    { name: "How it works", path: "/how-it-works" },
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Community", path: "/community" },
+    { name: "About", path: "/about" }
+  ];
 
   return (
     <motion.nav
@@ -62,15 +68,15 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
               <motion.div
-                key={item}
+                key={item.path}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
-                  to={`#${item.toLowerCase()}`}
+                  to={item.path}
                   className="text-gray-300 hover:text-emerald-300 transition-colors font-medium"
                 >
-                  {item}
+                  {item.name}
                 </Link>
               </motion.div>
             ))}
@@ -98,11 +104,7 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                   Log In
                 </motion.button>
                 <motion.button
-                  onClick={() => {
-                    if (onLoginClick) {
-                      onLoginClick();
-                    }
-                  }}
+                  onClick={onLoginClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
@@ -150,17 +152,17 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
               <div className="pt-4 pb-6 space-y-4">
                 {navItems.map((item) => (
                   <motion.div
-                    key={item}
+                    key={item.path}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.3 }}
                   >
                     <Link
-                      to={`#${item.toLowerCase()}`}
+                      to={item.path}
                       className="block px-3 py-2 text-gray-300 hover:text-emerald-300 transition-colors font-medium"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      {item}
+                      {item.name}
                     </Link>
                   </motion.div>
                 ))}
@@ -187,9 +189,7 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, delay: 0.1 }}
                         onClick={() => {
-                          if (onLoginClick) {
-                            onLoginClick();
-                          }
+                          onLoginClick?.();
                           setMobileMenuOpen(false);
                         }}
                         className="block w-full text-center px-6 py-3 mb-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
@@ -201,9 +201,7 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, delay: 0.2 }}
                         onClick={() => {
-                          if (onLoginClick) {
-                            onLoginClick();
-                          }
+                          onLoginClick?.();
                           setMobileMenuOpen(false);
                         }}
                         className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
