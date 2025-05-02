@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FiUsers, FiGlobe, FiAward, FiHeart } from "react-icons/fi";
-import taraImage from './assets/images/tara.jpg';
-import vaspImage from './assets/images/vasp.jpg';
+import taraImage from '../assets/images/tara.jpg';
+import vaspImage from '../assets/images/vasp.jpg';
 
 const About = () => {
   const [stats, setStats] = useState([
