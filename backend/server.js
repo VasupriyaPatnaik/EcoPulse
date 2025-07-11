@@ -1,6 +1,7 @@
 // server.js
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 
@@ -8,6 +9,12 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // React app URL
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
