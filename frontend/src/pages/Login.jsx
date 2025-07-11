@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import axios from "../utils/api";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
