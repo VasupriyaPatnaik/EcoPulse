@@ -74,21 +74,24 @@ const About = () => {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative py-16 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6 relative z-10">
-          <motion.div
+      <section className="py-20 bg-emerald-600 text-white">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
+            className="text-4xl md:text-5xl font-bold mb-6"
           >
-            <h1 className="text-4xl font-medium text-gray-900 mb-4">
-              About Our Journey
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're a small team passionate about making environmental action accessible to everyone.
-            </p>
-          </motion.div>
+            About Our <span className="text-emerald-200">Journey</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-xl max-w-3xl mx-auto"
+          >
+            We're a small team passionate about making environmental action accessible to everyone.
+          </motion.p>
         </div>
       </section>
 
