@@ -416,13 +416,7 @@ export default function LandingPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
               className="w-full h-full flex items-center justify-center"
-            >
-              <img
-                src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcW0xN2R2a3F5b3l5b2V6dGJ0dWJ6eHZ1b2R4eWZ4cXJ4d3N1eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsQ8UQ1h4LhG1i/giphy.gif"
-                alt="Eco mascot"
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
+            ></motion.div>
           )}
         </div>
 
@@ -549,30 +543,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section
-        ref={statsRef}
-        className="relative z-10 py-20 bg-gradient-to-br from-emerald-900/80 to-teal-900/80"
-      >
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
-          {[
-            { value: "1M+", label: "Eco-Actions Logged", icon: "🌍" },
-            { value: "250K+", label: "Active Users", icon: "👥" },
-            { value: "5K+ Tons", label: "CO₂ Reduced", icon: "🌱" },
-          ].map((stat, idx) => (
-            <div
-              key={idx}
-              className="text-center p-8 bg-black/20 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:border-emerald-400 transition-colors duration-300"
-            >
-              <div className="text-6xl mb-2">{stat.icon}</div>
-              <div className="text-5xl font-bold text-emerald-300 mb-2">
-                {stat.value}
-              </div>
-              <div className="text-xl text-gray-300">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+{/* Stats Section */}
+<section 
+  ref={statsRef}
+  className="relative z-10 py-24 bg-gray-900 text-white"
+>
+  <div className="max-w-7xl mx-auto px-6">
+    <motion.h2
+      className="text-4xl font-bold text-center mb-16"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
+    >
+      Our <span className="text-emerald-400">Collective Impact</span>
+    </motion.h2>
+    
+    <div className="grid md:grid-cols-3 gap-8">
+      {[
+        { value: "1M+", label: "Eco-Actions Logged", icon: "🌍" },
+        { value: "250K+", label: "Active Users", icon: "👥" },
+        { value: "5K+ Tons", label: "CO₂ Reduced", icon: "🌱" },
+      ].map((stat, idx) => (
+        <motion.div
+          key={idx}
+          className="text-center p-8 bg-gray-800 rounded-xl border border-gray-700 hover:border-emerald-500 transition-all duration-300 hover:scale-[1.03] shadow-xl"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: idx * 0.1 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-5xl mb-4 text-emerald-400">{stat.icon}</div>
+          <div className="text-5xl font-bold text-white mb-3">
+            {stat.value}
+          </div>
+          <div className="text-xl text-gray-300 font-medium">
+            {stat.label}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* Floating Chatbot */}
       <AnimatePresence>

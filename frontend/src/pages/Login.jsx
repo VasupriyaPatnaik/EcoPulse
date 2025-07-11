@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiUser } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,12 +12,35 @@ export default function LoginPage() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
 
-  const handleSubmit = (e) => {
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Login logic here
-    setTimeout(() => setIsLoading(false), 2000);
+    setError("");
+    
+    try {
+      const success = await login(formData.email, formData.password);
+      
+      if (success) {
+        navigate("/dashboard"); // Redirect to dashboard after successful login
+      } else {
+        setError("Invalid email or password");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -65,6 +90,16 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 bg-red-900/50 text-red-200 rounded-lg text-sm"
+            >
+              {error}
+            </motion.div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -112,18 +147,19 @@ export default function LoginPage() {
                 type="button"
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400 transition-colors" />
                 ) : (
-                  <FiEye className="text-gray-400 hover:text-emerald-400" />
+                  <FiEye className="text-gray-400 hover:text-emerald-400 transition-colors" />
                 )}
               </button>
             </div>
             <div className="flex justify-end mt-2">
               <Link
                 to="/forgot-password"
-                className="text-sm text-emerald-400 hover:text-emerald-300"
+                className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -139,12 +175,12 @@ export default function LoginPage() {
               isLoading
                 ? "bg-emerald-700 cursor-not-allowed"
                 : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-            } text-white shadow-lg`}
+            } text-white shadow-lg flex items-center justify-center gap-2`}
           >
             {isLoading ? (
-              <span className="flex items-center justify-center">
+              <>
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -164,9 +200,12 @@ export default function LoginPage() {
                   ></path>
                 </svg>
                 Signing in...
-              </span>
+              </>
             ) : (
-              "Sign In"
+              <>
+                <FiUser className="text-lg" />
+                Sign In
+              </>
             )}
           </motion.button>
         </form>
@@ -177,7 +216,7 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-emerald-400 hover:text-emerald-300 font-medium"
+              className="text-emerald-400 hover:text-emerald-300 transition-colors"
             >
               Sign up
             </Link>
