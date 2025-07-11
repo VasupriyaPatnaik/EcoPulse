@@ -1,60 +1,50 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/api'; // Make sure this points to your axios base instance
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check for existing token on initial load
   useEffect(() => {
-    const initAuth = async () => {
+    const init = async () => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        // Fetch user data if token exists
         await fetchUserData();
       }
       setIsLoading(false);
     };
-    
-    initAuth();
+
+    init();
   }, [token]);
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get('/api/user'); // Your user endpoint
-      setUser(response.data);
+      const res = await axios.get('/auth/user'); // Your backend GET route
+      setUser(res.data);
     } catch (error) {
-      console.error('Failed to fetch user data', error);
-      // For now, don't logout on fetch failure - just set a dummy user
-      // This is because the backend might not be running
-      setUser({ email: 'demo@example.com', name: 'Demo User' });
+      console.error("Error fetching user", error);
+      logout(); // Optional: auto logout if token invalid
     }
   };
 
   const login = async (email, password) => {
     try {
-      // For now, simulate a successful login since backend might not be running
-      // Replace this with actual API call when backend is ready
-      // const response = await axios.post('/api/login', { email, password });
-      // const { user, token } = response.data;
-      
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      const mockUser = { email, name: email.split('@')[0] };
-      
-      localStorage.setItem('token', mockToken);
-      setToken(mockToken);
-      setUser(mockUser);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`;
-      
-      // Don't redirect here - let the Login component handle redirection
+      const res = await axios.post('/auth/login', { email, password });
+      const { token, user } = res.data;
+
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      setToken(token);
+      setUser(user);
       return true;
     } catch (error) {
-      console.error('Login failed', error);
+      console.error('Login error:', error);
       return false;
     }
   };
