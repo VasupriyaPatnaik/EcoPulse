@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiTrendingUp, FiDroplet, FiZap, FiAward, FiCalendar, FiBarChart2 } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   // State for stats with animation triggers
   const [stats, setStats] = useState([
     { label: "CO₂ Saved", value: 0, target: 12.5, unit: "kg", color: "bg-green-100", icon: <FiTrendingUp className="text-green-600" /> },
@@ -100,7 +102,7 @@ export default function Dashboard() {
           className="text-center mb-10"
         >
           <h1 className="text-3xl font-bold text-green-800 mb-2">
-            Welcome Back, Eco Hero! <span className="text-3xl">🌍</span>
+            Welcome Back, {user?.name || 'Eco Hero'}! <span className="text-3xl">🌍</span>
           </h1>
           <p className="text-gray-600">Keep up the great work saving our planet!</p>
         </motion.div>
