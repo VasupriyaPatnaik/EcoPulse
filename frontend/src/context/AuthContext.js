@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../utils/api'; // Make sure this points to your axios base instance
+import axios from '../utils/api'; // Ensure this points to your base axios instance
 
 const AuthContext = createContext();
 
@@ -11,40 +11,36 @@ export function AuthProvider({ children }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const init = async () => {
+    const initAuth = async () => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await fetchUserData();
+        try {
+          const response = await axios.get('/api/auth/user'); // Adjust to match your backend route
+          setUser(response.data);
+        } catch (error) {
+          console.error('Failed to fetch user data', error);
+          logout(); // Optional: auto logout if token is invalid
+        }
       }
       setIsLoading(false);
     };
 
-    init();
+    initAuth();
   }, [token]);
-
-  const fetchUserData = async () => {
-    try {
-      const res = await axios.get('/auth/user'); // Your backend GET route
-      setUser(res.data);
-    } catch (error) {
-      console.error("Error fetching user", error);
-      logout(); // Optional: auto logout if token invalid
-    }
-  };
 
   const login = async (email, password) => {
     try {
-      const res = await axios.post('/auth/login', { email, password });
-      const { token, user } = res.data;
+      const response = await axios.post('/api/auth/login', { email, password });
+      const { token, name, email: userEmail, _id } = response.data;
 
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
       setToken(token);
-      setUser(user);
+      setUser({ name, email: userEmail, _id });
+
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login failed', error);
       return false;
     }
   };
@@ -63,7 +59,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     isAuthenticated: !!token,
-    isLoading
+    isLoading,
   };
 
   return (
