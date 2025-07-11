@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Application } from "@splinetool/runtime";
 import { gsap } from "gsap";
@@ -23,7 +23,6 @@ export default function LandingPage() {
   });
   const [authError, setAuthError] = useState("");
   const [voicePlayed, setVoicePlayed] = useState(false);
-  const [ecoFact, setEcoFact] = useState("");
   const [splineLoaded, setSplineLoaded] = useState(false);
   const [splineError, setSplineError] = useState(false);
   const [chatMessages, setChatMessages] = useState([
@@ -57,7 +56,7 @@ export default function LandingPage() {
   }, []);
 
   // Voice greeting
-  const speak = (text) => {
+  const speak = useCallback((text) => {
     if ("speechSynthesis" in window && !voicePlayed) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;
@@ -65,7 +64,7 @@ export default function LandingPage() {
       window.speechSynthesis.speak(utterance);
       setVoicePlayed(true);
     }
-  };
+  }, [voicePlayed]);
 
   // Load Spline scene
   useEffect(() => {
@@ -96,7 +95,7 @@ export default function LandingPage() {
         splineInstance.current.dispose();
       }
     };
-  }, []);
+  }, [speak]); // Now speak is memoized with useCallback
 
   // Animate stats counter
   useEffect(() => {
