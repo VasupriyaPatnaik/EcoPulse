@@ -461,8 +461,11 @@ export default function LandingPage() {
           >
             <motion.button
               onClick={() => {
-                setAuthMode("signup");
-                setShowAuthModal(true);
+                if (isAuthenticated) {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/login");
+                }
               }}
               className="relative px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-emerald-400/30 transition-all duration-300 overflow-hidden group"
               whileHover={{
