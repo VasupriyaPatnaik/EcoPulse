@@ -15,7 +15,14 @@ const About = () => {
   // Animate counters
   useEffect(() => {
     const duration = 2000;
-    stats.forEach((stat, index) => {
+    const initialStats = [
+      { value: 0, target: 50, label: "Active Users", icon: <FiUsers className="text-2xl" /> },
+      { value: 0, target: 150, label: "Actions Logged", icon: <FiHeart className="text-2xl" /> },
+      { value: 0, target: 1, label: "Universities", icon: <FiGlobe className="text-2xl" /> },
+      { value: 0, target: 25, label: "CO₂ Saved (kg)", icon: <FiAward className="text-2xl" /> }
+    ];
+
+    initialStats.forEach((stat, index) => {
       const start = Date.now();
       const animate = () => {
         const elapsed = Date.now() - start;
@@ -32,7 +39,7 @@ const About = () => {
       };
       setTimeout(animate, index * 200);
     });
-  }, []);
+  }, []); // Empty dependency array is correct here
 
   const teamMembers = [
     {
