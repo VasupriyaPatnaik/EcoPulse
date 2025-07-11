@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FiTrendingUp, FiDroplet, FiZap, FiAward, FiCalendar, FiBarChart2 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 
@@ -15,6 +15,12 @@ export default function Dashboard() {
   // Animated counter effect
   useEffect(() => {
     const duration = 2000; // Animation duration in ms
+    const initialStats = [
+      { label: "CO₂ Saved", value: 0, target: 12.5, unit: "kg", color: "bg-green-100", icon: <FiTrendingUp className="text-green-600" /> },
+      { label: "Water Saved", value: 0, target: 89, unit: "L", color: "bg-blue-100", icon: <FiDroplet className="text-blue-600" /> },
+      { label: "Energy Saved", value: 0, target: 6.3, unit: "kWh", color: "bg-yellow-100", icon: <FiZap className="text-yellow-600" /> }
+    ];
+
     const increment = (stat, index) => {
       const start = Date.now();
       const animate = () => {
@@ -33,11 +39,11 @@ export default function Dashboard() {
       animate();
     };
 
-    stats.forEach((stat, index) => increment(stat, index));
-  }, []);
+    initialStats.forEach((stat, index) => increment(stat, index));
+  }, []); // Empty dependency array is correct here
 
   // Badges with unlock status
-  const [badges, setBadges] = useState([
+  const [badges] = useState([
     { name: "Water Warrior", earned: true, description: "Saved 50+ liters of water" },
     { name: "Carbon Cutter", earned: true, description: "Reduced CO₂ by 5+ kg" },
     { name: "Energy Saver", earned: true, description: "Saved 5+ kWh energy" },
