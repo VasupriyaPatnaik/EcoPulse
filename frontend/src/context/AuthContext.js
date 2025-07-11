@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from '../utils/api'; // Ensure this points to your base axios instance
+import axios from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -10,23 +10,32 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // ✅ useCallback to avoid eslint warning
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setToken(null);
+    setUser(null);
+    navigate('/login');
+  }, [navigate]);
+
   useEffect(() => {
     const initAuth = async () => {
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          const response = await axios.get('/api/auth/user'); // Adjust to match your backend route
+          const response = await axios.get('/api/auth/user');
           setUser(response.data);
         } catch (error) {
           console.error('Failed to fetch user data', error);
-          logout(); // Optional: auto logout if token is invalid
+          logout(); // ✅ no more warning
         }
       }
       setIsLoading(false);
     };
 
     initAuth();
-  }, [token]);
+  }, [token, logout]); // ✅ logout added here safely
 
   const login = async (email, password) => {
     try {
@@ -43,14 +52,6 @@ export function AuthProvider({ children }) {
       console.error('Login failed', error);
       return false;
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setToken(null);
-    setUser(null);
-    navigate('/login');
   };
 
   const value = {
