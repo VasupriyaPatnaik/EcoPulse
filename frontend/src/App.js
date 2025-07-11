@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import HowItWorks from "./pages/HowItWorks";
 import Community from "./pages/Community";
 import About from "./pages/About";
+import ProtectedRoute from "./components/ProtectedRoute";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy load pages for better performance
@@ -41,7 +42,11 @@ function App() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/community" element={<Community />} />
             <Route path="/about" element={<About />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
             
             {/* Protected routes - add here if you need any truly protected routes later */}
             {/* 
