@@ -34,20 +34,19 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    
+
     try {
-      // Registration logic here - replace with actual API call
-      // Example: await axios.post('/api/register', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Redirect to login page after successful registration
-      navigate("/login");
+      await axios.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      navigate("/login"); // Redirect after successful registration
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
     }
   };
 
