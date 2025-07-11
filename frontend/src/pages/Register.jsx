@@ -36,17 +36,23 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await axios.post("/auth/register", {
+      const response = await axios.post("/auth/register", {
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
 
+      console.log("Registration successful:", response.data);
+      alert("Registration successful! Redirecting to login...");
       navigate("/login"); // Redirect after successful registration
     } catch (err) {
+      console.error("Registration error:", err);
+      console.error("Error response:", err.response?.data);
       setError(
         err.response?.data?.message || "Registration failed. Please try again."
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
