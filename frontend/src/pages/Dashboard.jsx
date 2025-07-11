@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { FiTrendingUp, FiDroplet, FiZap, FiAward, FiCalendar, FiBarChart2 } from "react-icons/fi";
 
 export default function Dashboard() {
@@ -92,10 +90,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Navbar />
-
-      <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Animated Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -296,9 +292,7 @@ export default function Dashboard() {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
