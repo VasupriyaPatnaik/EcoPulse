@@ -6,10 +6,10 @@ import vaspImage from '../assets/images/vasp.jpg';
 
 const About = () => {
   const [stats, setStats] = useState([
-    { value: 0, target: 1200, label: "Community Members", icon: <FiUsers className="text-2xl" /> },
-    { value: 0, target: 3, label: "Countries", icon: <FiGlobe className="text-2xl" /> },
-    { value: 0, target: 2, label: "Projects", icon: <FiAward className="text-2xl" /> },
-    { value: 0, target: 120, label: "Trees Planted", icon: <FiHeart className="text-2xl" /> }
+    { value: 0, target: 50, label: "Active Users", icon: <FiUsers className="text-2xl" /> },
+    { value: 0, target: 150, label: "Actions Logged", icon: <FiHeart className="text-2xl" /> },
+    { value: 0, target: 1, label: "Universities", icon: <FiGlobe className="text-2xl" /> },
+    { value: 0, target: 25, label: "CO₂ Saved (kg)", icon: <FiAward className="text-2xl" /> }
   ]);
 
   // Animate counters
@@ -37,19 +37,19 @@ const About = () => {
   const teamMembers = [
     {
       name: "Vasupriya Patnaik",
-      role: "Co-Founder",
-      bio: "Passionate about sustainable living and community building. Believes small actions can create big change.",
+      role: "Co-Founder & Community Lead",
+      bio: "A student passionate about creating awareness around environmental issues. Always looking for practical ways to make sustainability accessible to everyone.",
       image: vaspImage,
-      expertise: ["Sustainability", "Community Engagement"],
-      funFact: "Started a neighborhood composting initiative",
+      expertise: ["Sustainability Research", "Community Outreach"],
+      motivation: "Loves connecting with like-minded people who care about our planet",
     },
     {
       name: "Tarakanta Acharya",
-      role: "Co-Founder",
-      bio: "Tech enthusiast who wants to use technology for environmental good. Builds simple solutions to complex problems.",
+      role: "Co-Founder & Technical Lead",
+      bio: "A developer who believes technology can be a force for good. Enjoys building tools that help people make better environmental choices.",
       image: taraImage,
-      expertise: ["Web Development", "Data Visualization"],
-      funFact: "Built a solar-powered weather station",
+      expertise: ["Full-Stack Development", "UI/UX Design"],
+      motivation: "Excited about using code to create positive environmental impact",
     }
   ];
 
@@ -146,12 +146,13 @@ const About = () => {
               </h2>
               <div className="space-y-4 text-gray-600">
                 <p>
-                  In 2022, we noticed that many environmental platforms were either too technical or focused on large-scale actions. 
-                  We wanted to create something different - a space where regular people could find simple, practical ways to make a difference.
+                  EcoPulse started as a college project in 2024. We noticed that while many people wanted to live more sustainably, 
+                  they often didn't know where to start or how to track their progress effectively.
                 </p>
                 <p>
-                  What began as a weekend project sharing local sustainability tips has grown into a small but dedicated community. 
-                  We're still learning as we go, but we're committed to keeping our approach grounded and honest.
+                  As students ourselves, we wanted to create something simple and practical - a platform where people could 
+                  easily log their eco-friendly actions and see the real impact they're making. We're still learning and 
+                  growing, but we're excited about the journey ahead.
                 </p>
               </div>
             </motion.div>
@@ -246,15 +247,15 @@ const About = () => {
                     <h4 className="font-medium text-sm text-gray-500 mb-1">Focus Areas</h4>
                     <div className="flex flex-wrap gap-2">
                       {member.expertise.map((item, i) => (
-                        <span key={i} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                        <span key={i} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-medium">
                           {item}
                         </span>
                       ))}
                     </div>
                   </div>
                   
-                  <p className="text-sm text-gray-500">
-                    <span className="font-medium">Fun fact:</span> {member.funFact}
+                  <p className="text-sm text-gray-600 italic">
+                    "{member.motivation}"
                   </p>
                 </div>
               </motion.div>
