@@ -26,11 +26,17 @@ export default function LandingPage() {
   const [ecoFact, setEcoFact] = useState("");
   const [splineLoaded, setSplineLoaded] = useState(false);
   const [splineError, setSplineError] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { text: "Hi! I'm EcoBot. Ask me anything about sustainability, recycling, or environmental tips! 🌱", sender: "bot" }
+  ]);
+  const [userInput, setUserInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const statsRef = useRef(null);
   const canvasRef = useRef(null);
   const splineCanvasRef = useRef(null);
   const splineInstance = useRef(null);
   const authModalRef = useRef(null);
+  const chatMessagesRef = useRef(null);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
@@ -240,6 +246,146 @@ export default function LandingPage() {
       color: "text-amber-400",
     },
   ];
+
+  // Eco-friendly knowledge base
+  const ecoKnowledgeBase = {
+    recycling: [
+      "Recycling one aluminum can saves enough energy to run a TV for 3 hours! ♻️",
+      "Glass can be recycled endlessly without losing quality. It's 100% recyclable! 🥃",
+      "Recycling one ton of paper saves 17 trees, 7,000 gallons of water, and 3.3 cubic yards of landfill space! 📄",
+      "Plastic bottles can take up to 450 years to decompose, but recycling them saves 80% of the energy needed to make new ones! 🧴"
+    ],
+    energy: [
+      "LED bulbs use 75% less energy than incandescent bulbs and last 25 times longer! 💡",
+      "Unplugging devices when not in use can save up to 10% on your electricity bill! 🔌",
+      "Solar panels can reduce your carbon footprint by 3-4 tons of CO2 per year! ☀️",
+      "A programmable thermostat can save you up to 10% on heating and cooling costs! 🌡️"
+    ],
+    water: [
+      "A dripping faucet can waste over 3,000 gallons of water per year! 💧",
+      "Taking shorter showers can save up to 2,300 gallons of water per year! 🚿",
+      "Collecting rainwater for plants can reduce your water bill by 40%! 🌧️",
+      "Fixing leaks immediately can save thousands of gallons of water annually! 🔧"
+    ],
+    transportation: [
+      "Biking instead of driving for short trips can reduce CO2 emissions by 2,400 pounds per year! 🚴",
+      "Electric vehicles produce 60% fewer emissions than gas cars over their lifetime! 🚗⚡",
+      "Using public transport can reduce your carbon footprint by 4,800 pounds of CO2 annually! 🚌",
+      "Carpooling just 2 days a week can reduce your carbon footprint by 1,600 pounds per year! 👥"
+    ],
+    food: [
+      "Composting food waste reduces methane emissions and creates nutrient-rich soil! 🍃",
+      "Eating less meat just one day a week can save 1,900 pounds of CO2 annually! 🥗",
+      "Buying local produce reduces transportation emissions by up to 95%! 🍎",
+      "Growing your own herbs can reduce packaging waste and save money! 🌿"
+    ],
+    general: [
+      "The average person produces 4.5 pounds of trash per day. Reduce, reuse, recycle! 🗑️",
+      "Switching to reusable bags can prevent 1,000 plastic bags from entering landfills per year! 🛍️",
+      "Digital receipts can save millions of trees from being cut down! 📱",
+      "One mature tree can absorb 48 pounds of CO2 per year! 🌳"
+    ]
+  };
+
+  // Random eco tips
+  const randomEcoTips = [
+    "💡 Tip: Use both sides of paper to reduce waste by 50%!",
+    "🌱 Tip: Plant native species in your garden - they require less water and maintenance!",
+    "🔋 Tip: Charge your devices during off-peak hours to reduce energy demand!",
+    "🧽 Tip: Make your own cleaning products with vinegar and baking soda!",
+    "☕ Tip: Bring your own cup to coffee shops - many offer discounts!",
+    "🥤 Tip: Use a reusable water bottle to prevent 156 plastic bottles per year!",
+    "🏠 Tip: Seal air leaks in your home to save up to 20% on heating costs!",
+    "📦 Tip: Reuse cardboard boxes for storage or donate them to local businesses!"
+  ];
+
+  // Chatbot response logic
+  const getChatbotResponse = (userMessage) => {
+    const message = userMessage.toLowerCase();
+    
+    // Check for greetings
+    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+      return "Hello! 👋 I'm here to help you learn about sustainable living. What would you like to know about?";
+    }
+    
+    // Check for thanks
+    if (message.includes('thank') || message.includes('thanks')) {
+      return "You're welcome! 😊 Keep up the great work making our planet greener! 🌍";
+    }
+    
+    // Topic-based responses
+    if (message.includes('recycle') || message.includes('recycling')) {
+      return ecoKnowledgeBase.recycling[Math.floor(Math.random() * ecoKnowledgeBase.recycling.length)];
+    }
+    
+    if (message.includes('energy') || message.includes('electricity') || message.includes('power')) {
+      return ecoKnowledgeBase.energy[Math.floor(Math.random() * ecoKnowledgeBase.energy.length)];
+    }
+    
+    if (message.includes('water') || message.includes('shower') || message.includes('faucet')) {
+      return ecoKnowledgeBase.water[Math.floor(Math.random() * ecoKnowledgeBase.water.length)];
+    }
+    
+    if (message.includes('transport') || message.includes('car') || message.includes('bike') || message.includes('drive')) {
+      return ecoKnowledgeBase.transportation[Math.floor(Math.random() * ecoKnowledgeBase.transportation.length)];
+    }
+    
+    if (message.includes('food') || message.includes('eat') || message.includes('compost')) {
+      return ecoKnowledgeBase.food[Math.floor(Math.random() * ecoKnowledgeBase.food.length)];
+    }
+    
+    if (message.includes('tip') || message.includes('advice') || message.includes('help')) {
+      return randomEcoTips[Math.floor(Math.random() * randomEcoTips.length)];
+    }
+    
+    if (message.includes('climate') || message.includes('global warming') || message.includes('carbon')) {
+      return "Climate change is real! 🌡️ Small actions like reducing energy use, recycling, and choosing sustainable products can make a big difference. Every action counts! 🌍";
+    }
+    
+    if (message.includes('plastic') || message.includes('bottle')) {
+      return "Plastic pollution is a huge problem! 🌊 Try using reusable alternatives like glass containers, metal straws, and cloth bags. Your choices matter! ♻️";
+    }
+    
+    // Default responses for unknown queries
+    const defaultResponses = [
+      "That's a great question! 🤔 Here's what I know: " + ecoKnowledgeBase.general[Math.floor(Math.random() * ecoKnowledgeBase.general.length)],
+      "I'm still learning about that topic! 🧠 But here's a helpful eco-tip: " + randomEcoTips[Math.floor(Math.random() * randomEcoTips.length)],
+      "Interesting! 🌟 Let me share something related: " + ecoKnowledgeBase.general[Math.floor(Math.random() * ecoKnowledgeBase.general.length)],
+      "Great question! 💚 While I think about that, here's an eco-fact: " + ecoKnowledgeBase.general[Math.floor(Math.random() * ecoKnowledgeBase.general.length)]
+    ];
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+  };
+
+  // Handle chat message submission
+  const handleChatSubmit = () => {
+    if (!userInput.trim()) return;
+    
+    // Add user message
+    const userMessage = { text: userInput, sender: "user" };
+    setChatMessages(prev => [...prev, userMessage]);
+    
+    // Set typing indicator
+    setIsTyping(true);
+    
+    // Clear input
+    setUserInput("");
+    
+    // Generate bot response after a delay
+    setTimeout(() => {
+      const botResponse = getChatbotResponse(userInput);
+      const botMessage = { text: botResponse, sender: "bot" };
+      setChatMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+  };
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-gray-900 to-emerald-900 text-white min-h-screen">
@@ -591,49 +737,129 @@ export default function LandingPage() {
   </div>
 </section>
 
+      {/* Floating Chatbot Button */}
+      <AnimatePresence>
+        {!showChatbot && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => setShowChatbot(true)}
+            className="fixed bottom-8 right-8 z-50 w-16 h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform duration-200 border-2 border-emerald-400/30"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <span className="animate-pulse">🤖</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Floating Chatbot */}
       <AnimatePresence>
         {showChatbot && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed bottom-8 right-8 z-50 w-80 bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-emerald-400/30"
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 50 }}
+            className="fixed bottom-8 right-8 z-50 w-96 bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-emerald-400/30"
           >
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white font-bold flex justify-between items-center">
-              <span>EcoBot Assistant</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🤖</span>
+                <div>
+                  <span className="block text-sm">EcoBot Assistant</span>
+                  <span className="block text-xs text-emerald-200">Online • Ready to help</span>
+                </div>
+              </div>
               <button
                 onClick={() => setShowChatbot(false)}
-                className="text-white hover:text-gray-200"
+                className="text-white hover:text-gray-200 text-xl"
               >
                 ✕
               </button>
             </div>
-            <div className="p-4 h-60 overflow-y-auto">
-              <div className="bg-gray-700/50 rounded-lg p-3 mb-3 text-sm">
-                Hi! I'm EcoBot. Ask me anything about sustainability!
-              </div>
-              <input
-                type="text"
-                placeholder="Ask an eco-question..."
-                className="w-full bg-gray-700/50 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    setEcoFact(
-                      "Did you know? Recycling one aluminum can saves enough energy to run a TV for 3 hours!"
-                    );
-                  }
-                }}
-              />
-              {ecoFact && (
+            
+            <div className="p-4 h-80 overflow-y-auto bg-gray-900 space-y-3" ref={chatMessagesRef}>
+              {chatMessages.map((message, index) => (
                 <motion.div
+                  key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-emerald-900/30 rounded-lg p-3 mt-3 text-sm border border-emerald-400/20"
+                  transition={{ delay: index * 0.1 }}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {ecoFact}
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
+                      message.sender === 'user'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-gray-700 text-gray-200 border border-gray-600'
+                    }`}
+                  >
+                    {message.text}
+                  </div>
+                </motion.div>
+              ))}
+              
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex justify-start"
+                >
+                  <div className="bg-gray-700 text-gray-200 border border-gray-600 max-w-xs px-4 py-2 rounded-lg text-sm">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                  </div>
                 </motion.div>
               )}
+            </div>
+            
+            <div className="p-4 bg-gray-800 border-t border-gray-700">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  placeholder="Ask about recycling, energy, water saving..."
+                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleChatSubmit();
+                    }
+                  }}
+                />
+                <button
+                  onClick={handleChatSubmit}
+                  disabled={!userInput.trim() || isTyping}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-medium"
+                >
+                  Send
+                </button>
+              </div>
+              
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['💡 Energy tips', '♻️ Recycling', '💧 Water saving', '🌱 Random tip'].map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      const topicMap = {
+                        '💡 Energy tips': 'energy',
+                        '♻️ Recycling': 'recycling',
+                        '💧 Water saving': 'water',
+                        '🌱 Random tip': 'tip'
+                      };
+                      setUserInput(topicMap[suggestion]);
+                      setTimeout(() => handleChatSubmit(), 100);
+                    }}
+                    className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-full text-xs transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
