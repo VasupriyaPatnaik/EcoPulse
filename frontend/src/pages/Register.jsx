@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import axios from "../utils/api";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
