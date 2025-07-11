@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Application } from "@splinetool/runtime";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import EcoMascot from "../components/EcoMascot";
+import { useAuth } from "../context/AuthContext";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -29,6 +31,8 @@ export default function LandingPage() {
   const splineCanvasRef = useRef(null);
   const splineInstance = useRef(null);
   const authModalRef = useRef(null);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   // Handle click outside auth modal
   useEffect(() => {
@@ -247,10 +251,8 @@ export default function LandingPage() {
 
       <Navbar
         onLoginClick={() => {
-          setAuthMode("login");
-          setShowAuthModal(true);
+          navigate("/login");
         }}
-        isAuthenticated={false} // Set this based on your auth state
       />
       <EcoMascot />
 
