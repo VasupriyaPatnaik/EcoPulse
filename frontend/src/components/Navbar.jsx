@@ -19,7 +19,6 @@ export default function Navbar({ onLoginClick }) {
   // Updated navigation items with proper routes
   const navItems = [
     { name: "How it works", path: "/how-it-works" },
-    { name: "Dashboard", path: "/dashboard" },
     { name: "Community", path: "/community" },
     { name: "About", path: "/about" }
   ];
