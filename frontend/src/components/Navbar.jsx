@@ -1,10 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
-export default function Navbar({ onLoginClick, isAuthenticated }) {
+export default function Navbar({ onLoginClick }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,13 +87,23 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-4"
               >
+                <span className="text-emerald-300 font-medium">
+                  Welcome, {user?.name || 'User'}
+                </span>
                 <Link
                   to="/dashboard"
-                  className="px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all block"
+                  className="px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
                 >
                   Dashboard
                 </Link>
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
+                >
+                  Logout
+                </button>
               </motion.div>
             ) : (
               <>
@@ -101,15 +113,14 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                   whileTap={{ scale: 0.95 }}
                   className="text-gray-300 hover:text-emerald-300 transition-colors font-medium"
                 >
-                  Log In
+                  <Link to="/login">Log In</Link>
                 </motion.button>
                 <motion.button
-                  onClick={onLoginClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="px-6 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
                 >
-                  Sign Up
+                  <Link to="/register">Sign Up</Link>
                 </motion.button>
               </>
             )}
@@ -173,7 +184,11 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ duration: 0.3, delay: 0.2 }}
+                      className="space-y-3"
                     >
+                      <div className="text-center text-emerald-300 font-medium">
+                        Welcome, {user?.name || 'User'}
+                      </div>
                       <Link
                         to="/dashboard"
                         className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
@@ -181,33 +196,44 @@ export default function Navbar({ onLoginClick, isAuthenticated }) {
                       >
                         Dashboard
                       </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block w-full text-center px-6 py-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
+                      >
+                        Logout
+                      </button>
                     </motion.div>
                   ) : (
                     <>
-                      <motion.button
+                      <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, delay: 0.1 }}
-                        onClick={() => {
-                          onLoginClick?.();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-center px-6 py-3 mb-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
                       >
-                        Log In
-                      </motion.button>
-                      <motion.button
+                        <Link
+                          to="/login"
+                          className="block w-full text-center px-6 py-3 mb-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Log In
+                        </Link>
+                      </motion.div>
+                      <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, delay: 0.2 }}
-                        onClick={() => {
-                          onLoginClick?.();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
                       >
-                        Sign Up
-                      </motion.button>
+                        <Link
+                          to="/register"
+                          className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Sign Up
+                        </Link>
+                      </motion.div>
                     </>
                   )}
                 </div>
