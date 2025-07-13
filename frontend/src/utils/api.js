@@ -1,12 +1,12 @@
 import axios from "axios";
 
-// For Netlify deployment, API calls go to individual functions
+// For separate backend deployment
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? `${window.location.origin}/.netlify/functions` // Individual functions
-  : "http://localhost:8888/api"; // Netlify dev server in development
+  ? "https://your-backend-app.onrender.com" // Replace with your Render backend URL
+  : "http://localhost:5000"; // Local backend
 
 const instance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true,
   timeout: 10000, // 10 second timeout
 });
