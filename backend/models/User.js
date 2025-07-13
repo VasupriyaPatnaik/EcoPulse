@@ -18,6 +18,15 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 8,
   },
+  // Password reset functionality
+  resetPasswordOTP: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null,
+  },
   // Eco-activity tracking
   ecoStats: {
     totalPoints: { type: Number, default: 0 },
