@@ -7,6 +7,7 @@ import HowItWorks from "./pages/HowItWorks";
 import Community from "./pages/Community";
 import About from "./pages/About";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { DashboardProvider } from "./context/DashboardContext";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy load pages for better performance
@@ -28,42 +29,44 @@ function App() {
   const showGlobalNavbar = !pagesWithOwnNavbar.includes(location.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {showGlobalNavbar && (
-        <Navbar onLoginClick={handleLoginClick} />
-      )}
-      
-      <main className="flex-1">
-        <Suspense fallback={<div>Loading...</div>}> {/* Add fallback UI */}
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Protected routes - add here if you need any truly protected routes later */}
-            {/* 
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            */}
-            
-            {/* Add more routes as needed */}
-          </Routes>
-        </Suspense>
-      </main>
-      
-      <Footer />
-    </div>
+    <DashboardProvider>
+      <div className="min-h-screen flex flex-col">
+        {showGlobalNavbar && (
+          <Navbar onLoginClick={handleLoginClick} />
+        )}
+        
+        <main className="flex-1">
+          <Suspense fallback={<div>Loading...</div>}> {/* Add fallback UI */}
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Protected routes - add here if you need any truly protected routes later */}
+              {/* 
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              */}
+              
+              {/* Add more routes as needed */}
+            </Routes>
+          </Suspense>
+        </main>
+        
+        <Footer />
+      </div>
+    </DashboardProvider>
   );
 }
 
