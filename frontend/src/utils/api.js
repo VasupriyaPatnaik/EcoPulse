@@ -2,7 +2,7 @@ import axios from "axios";
 
 // For separate backend deployment
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? "https://your-backend-app.onrender.com" // Replace with your Render backend URL
+  ? "https://ecopulse-backend-lrsh.onrender.com" // Your deployed backend
   : "http://localhost:5000"; // Local backend
 
 const instance = axios.create({
