@@ -12,7 +12,7 @@
 **Transform your daily habits into meaningful environmental impact**  
 *Track • Compete • Achieve • Make a Difference* 🌍
 
-[🚀 Live Demo](#) • [📖 Documentation](https://docs.google.com/document/d/1vyWvu0ivqLy-IQ5lDwI8TFk2dyGHvlBm/edit?usp=sharing&ouid=108418581556305643665&rtpof=true&sd=true) • [🐛 Report Bug](https://github.com/VasupriyaPatnaik/EcoPulse/issues) • [💡 Request Feature](https://github.com/VasupriyaPatnaik/EcoPulse/issues)
+[🚀 Live Demo](https://ecopulsetrackr.netlify.app/) • [📖 Documentation](https://docs.google.com/document/d/1vyWvu0ivqLy-IQ5lDwI8TFk2dyGHvlBm/edit?usp=sharing&ouid=108418581556305643665&rtpof=true&sd=true) • [🐛 Report Bug](https://github.com/VasupriyaPatnaik/EcoPulse/issues) • [💡 Request Feature](https://github.com/VasupriyaPatnaik/EcoPulse/issues)
 
 </div>
 
