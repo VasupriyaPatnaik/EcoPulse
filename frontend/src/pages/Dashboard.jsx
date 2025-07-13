@@ -2,24 +2,123 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiTrendingUp, FiDroplet, FiZap, FiAward, FiCalendar, FiBarChart2 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useDashboard } from "../context/DashboardContext";
+import api from "../utils/api";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { refreshTrigger } = useDashboard();
+  
+  // Dynamic state for real user data
+  const [dashboardData, setDashboardData] = useState({
+    ecoStats: {
+      totalPoints: 0,
+      co2Saved: 0,
+      waterSaved: 0,
+      energySaved: 0,
+      activitiesLogged: 0,
+      streakDays: 0
+    },
+    recentActivities: [],
+    badges: [],
+    currentChallenge: {
+      title: "🚴 Car-Free Commute",
+      joined: false,
+      progress: 0,
+      goal: 3
+    }
+  });
+  
+  const [isLoading, setIsLoading] = useState(true);
+
   // State for stats with animation triggers
   const [stats, setStats] = useState([
-    { label: "CO₂ Saved", value: 0, target: 12.5, unit: "kg", color: "bg-green-100", icon: <FiTrendingUp className="text-green-600" /> },
-    { label: "Water Saved", value: 0, target: 89, unit: "L", color: "bg-blue-100", icon: <FiDroplet className="text-blue-600" /> },
-    { label: "Energy Saved", value: 0, target: 6.3, unit: "kWh", color: "bg-yellow-100", icon: <FiZap className="text-yellow-600" /> }
+    { label: "CO₂ Saved", value: 0, target: 0, unit: "kg", color: "bg-green-100", icon: <FiTrendingUp className="text-green-600" /> },
+    { label: "Water Saved", value: 0, target: 0, unit: "L", color: "bg-blue-100", icon: <FiDroplet className="text-blue-600" /> },
+    { label: "Energy Saved", value: 0, target: 0, unit: "kWh", color: "bg-yellow-100", icon: <FiZap className="text-yellow-600" /> }
   ]);
+
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get('/eco/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        setDashboardData(response.data);
+        
+        // Update stats with real data
+        const { ecoStats } = response.data;
+        setStats([
+          { 
+            label: "CO₂ Saved", 
+            value: 0, 
+            target: ecoStats.co2Saved, 
+            unit: "kg", 
+            color: "bg-green-100", 
+            icon: <FiTrendingUp className="text-green-600" /> 
+          },
+          { 
+            label: "Water Saved", 
+            value: 0, 
+            target: ecoStats.waterSaved, 
+            unit: "L", 
+            color: "bg-blue-100", 
+            icon: <FiDroplet className="text-blue-600" /> 
+          },
+          { 
+            label: "Energy Saved", 
+            value: 0, 
+            target: ecoStats.energySaved, 
+            unit: "kWh", 
+            color: "bg-yellow-100", 
+            icon: <FiZap className="text-yellow-600" /> 
+          }
+        ]);
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchDashboardData();
+    }
+    
+    // Add focus event listener to refresh data when user comes back to tab
+    const handleFocus = () => {
+      if (user && !isLoading) {
+        fetchDashboardData();
+      }
+    };
+    
+    // Add visibility change listener to refresh data when user comes back to tab
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user && !isLoading) {
+        fetchDashboardData();
+      }
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, isLoading, refreshTrigger]); // Add refreshTrigger to dependencies
 
   // Animated counter effect
   useEffect(() => {
+    if (isLoading) return;
+    
     const duration = 2000; // Animation duration in ms
-    const initialStats = [
-      { label: "CO₂ Saved", value: 0, target: 12.5, unit: "kg", color: "bg-green-100", icon: <FiTrendingUp className="text-green-600" /> },
-      { label: "Water Saved", value: 0, target: 89, unit: "L", color: "bg-blue-100", icon: <FiDroplet className="text-blue-600" /> },
-      { label: "Energy Saved", value: 0, target: 6.3, unit: "kWh", color: "bg-yellow-100", icon: <FiZap className="text-yellow-600" /> }
-    ];
 
     const increment = (stat, index) => {
       const start = Date.now();
@@ -39,46 +138,56 @@ export default function Dashboard() {
       animate();
     };
 
-    initialStats.forEach((stat, index) => increment(stat, index));
-  }, []); // Empty dependency array is correct here
+    stats.forEach((stat, index) => increment(stat, index));
+  }, [isLoading, stats.length]); // Updated dependency
 
-  // Badges with unlock status
-  const [badges] = useState([
-    { name: "Water Warrior", earned: true, description: "Saved 50+ liters of water" },
-    { name: "Carbon Cutter", earned: true, description: "Reduced CO₂ by 5+ kg" },
-    { name: "Energy Saver", earned: true, description: "Saved 5+ kWh energy" },
-    { name: "Eco Champion", earned: false, description: "Complete all weekly challenges" },
-    { name: "Green Guru", earned: false, description: "30-day streak" }
-  ]);
+  // Badges with unlock status - now using dynamic data
+  const badges = dashboardData.badges;
 
-  // Weekly challenge state
-  const [challenge, setChallenge] = useState({
-    title: "🚴 Car-Free Commute",
-    description: "Avoid using your car for 3 days this week!",
-    progress: 1,
-    goal: 3,
-    joined: false
-  });
+  // Weekly challenge state - now using dynamic data
+  const [challenge, setChallenge] = useState(dashboardData.currentChallenge);
 
-  // Recent activities
-  const [activities] = useState([
-    { action: "Used reusable bottle", points: 10, time: "2h ago" },
-    { action: "Recycled 3 items", points: 15, time: "Yesterday" },
-    { action: "Walked to work", points: 20, time: "2 days ago" }
-  ]);
+  // Recent activities - now using dynamic data
+  const activities = dashboardData.recentActivities;
+
+  // Update challenge state when dashboardData changes
+  useEffect(() => {
+    setChallenge(dashboardData.currentChallenge);
+  }, [dashboardData.currentChallenge]);
 
   // Join challenge function
-  const joinChallenge = () => {
-    setChallenge(prev => ({ ...prev, joined: true }));
-    // Trigger confetti effect
-    if (typeof window !== 'undefined') {
-      import("canvas-confetti").then(confetti => {
-        confetti.default({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+  const joinChallenge = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.put('/eco/challenge', {
+        joined: true
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+      
+      // Update challenge with the response from backend
+      setChallenge(response.data.currentChallenge);
+      
+      // Also update the dashboard data
+      setDashboardData(prev => ({
+        ...prev,
+        currentChallenge: response.data.currentChallenge
+      }));
+      
+      // Trigger confetti effect
+      if (typeof window !== 'undefined') {
+        import("canvas-confetti").then(confetti => {
+          confetti.default({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error joining challenge:', error);
     }
   };
 
@@ -100,18 +209,24 @@ export default function Dashboard() {
   return (
     <div className="bg-gray-50 min-h-screen pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Animated Welcome Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10"
-        >
-          <h1 className="text-3xl font-bold text-green-800 mb-2">
-            Welcome Back, {user?.name || 'Eco Hero'}! <span className="text-3xl">🌍</span>
-          </h1>
-          <p className="text-gray-600">Keep up the great work saving our planet!</p>
-        </motion.div>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          </div>
+        ) : (
+          <>
+            {/* Animated Welcome Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-10"
+            >
+              <h1 className="text-3xl font-bold text-green-800 mb-2">
+                Welcome Back, {user?.name || 'Eco Hero'}! <span className="text-3xl">🌍</span>
+              </h1>
+              <p className="text-gray-600">Keep up the great work saving our planet!</p>
+            </motion.div>
 
         {/* Stats Grid with Animated Counters */}
         <section className="grid md:grid-cols-3 gap-6 mb-10">
@@ -131,9 +246,9 @@ export default function Dashboard() {
               <p className="text-3xl font-bold">
                 {item.value.toFixed(1)}{item.unit}
               </p>
-              <ProgressBar progress={item.value} total={item.target} />
+              <ProgressBar progress={item.value} total={Math.max(item.target, 1)} />
               <p className="text-sm mt-2 text-gray-600">
-                {((item.value / item.target) * 100).toFixed(0)}% of monthly goal
+                {item.target > 0 ? `${((item.value / item.target) * 100).toFixed(0)}% of monthly goal` : 'Start logging activities!'}
               </p>
             </motion.div>
           ))}
@@ -150,14 +265,14 @@ export default function Dashboard() {
               <h2 className="text-xl font-bold text-green-700">🔥 Weekly Streak</h2>
             </div>
             <p className="mb-2">
-              You've logged green actions for <strong>5</strong> consecutive days!
+              You've logged green actions for <strong>{dashboardData.ecoStats.streakDays}</strong> consecutive days!
             </p>
             <div className="flex mt-4">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div
                   key={day}
                   className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
-                    day <= 5 ? "bg-green-500 text-white" : "bg-gray-200"
+                    day <= dashboardData.ecoStats.streakDays ? "bg-green-500 text-white" : "bg-gray-200"
                   }`}
                 >
                   {day}
@@ -175,16 +290,16 @@ export default function Dashboard() {
               <h2 className="text-xl font-bold text-yellow-700">⭐ EcoPoints</h2>
             </div>
             <p className="mb-4">
-              Total earned: <strong>320</strong> points
+              Total earned: <strong>{dashboardData.ecoStats.totalPoints}</strong> points
             </p>
             <div className="w-full bg-gray-200 rounded-full h-4">
               <div
                 className="bg-yellow-500 h-4 rounded-full"
-                style={{ width: "64%" }}
+                style={{ width: `${Math.min((dashboardData.ecoStats.totalPoints / 500) * 100, 100)}%` }}
               ></div>
             </div>
             <p className="text-sm mt-2 text-gray-600">
-              64% to next level (Eco Champion)
+              {Math.min((dashboardData.ecoStats.totalPoints / 500) * 100, 100).toFixed(0)}% to next level (Eco Champion)
             </p>
           </motion.div>
         </section>
@@ -229,15 +344,15 @@ export default function Dashboard() {
             className="p-6 bg-white rounded-xl shadow-lg border-t-4 border-blue-500"
           >
             <h3 className="text-lg font-bold mb-2">{challenge.title}</h3>
-            <p className="mb-4">{challenge.description}</p>
+            <p className="mb-4">Avoid using your car for {Math.max(challenge.goal, 3)} days this week!</p>
             <div className="mb-4">
               <div className="flex justify-between mb-1">
                 <span>Progress:</span>
                 <span>
-                  {challenge.progress}/{challenge.goal} days
+                  {challenge.progress}/{Math.max(challenge.goal, 3)} days
                 </span>
               </div>
-              <ProgressBar progress={challenge.progress} total={challenge.goal} />
+              <ProgressBar progress={challenge.progress} total={Math.max(challenge.goal, 3)} />
             </div>
             {!challenge.joined ? (
               <motion.button
@@ -272,27 +387,36 @@ export default function Dashboard() {
         <section>
           <h2 className="text-xl font-bold text-green-700 mb-4">📝 Recent Activities</h2>
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <ul className="divide-y divide-gray-200">
-              {activities.map((activity, index) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="p-4 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">{activity.action}</p>
-                      <p className="text-sm text-gray-500">{activity.time}</p>
+            {activities.length > 0 ? (
+              <ul className="divide-y divide-gray-200">
+                {activities.map((activity, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">{activity.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'Recently'}
+                        </p>
+                      </div>
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
+                        +{activity.points} pts
+                      </span>
                     </div>
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
-                      +{activity.points} pts
-                    </span>
-                  </div>
-                </motion.li>
-              ))}
-            </ul>
+                  </motion.li>
+                ))}
+              </ul>
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                <p className="text-lg mb-2">No activities yet!</p>
+                <p className="text-sm">Complete activities in "How It Works" to see them here.</p>
+              </div>
+            )}
             <div className="p-4 text-center border-t border-gray-200">
               <button className="text-green-600 hover:text-green-800 font-medium">
                 View All Activities →
@@ -300,6 +424,8 @@ export default function Dashboard() {
             </div>
           </div>
         </section>
+          </>
+        )}
       </div>
     </div>
   );
