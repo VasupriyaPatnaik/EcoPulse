@@ -1,22 +1,110 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiAward, FiUsers, FiTrendingUp, FiClock, FiCheckCircle } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 
 const Community = () => {
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("leaderboard");
   const [joinedChallenges, setJoinedChallenges] = useState(["Plastic-Free Week"]);
+  const [userDashboardData, setUserDashboardData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Leaderboard data
-  const leaderboard = [
-    { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100 },
-    { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90 },
-    { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80 },
-    { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70 },
-    { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65 },
-    { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60 },
-    { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55 },
-    { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50 },
-  ];
+  // Leaderboard data with dynamic user integration
+  const getLeaderboardWithUser = () => {
+    const staticLeaderboard = [
+      { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, isUser: false },
+      { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, isUser: false },
+      { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, isUser: false },
+      { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, isUser: false },
+      { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, isUser: false },
+      { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, isUser: false },
+      { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, isUser: false },
+      { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, isUser: false },
+    ];
+
+    if (!isAuthenticated || !userDashboardData) {
+      return staticLeaderboard;
+    }
+
+    // Add current user to leaderboard
+    const userPoints = userDashboardData.ecoStats.totalPoints;
+    
+    // Don't add user to main leaderboard if they have 0 points
+    if (userPoints === 0) {
+      return staticLeaderboard;
+    }
+
+    const userEntry = {
+      rank: 0, // Will be calculated
+      name: user?.name || 'You',
+      points: userPoints,
+      avatar: "👋",
+      progress: Math.min((userPoints / 1245) * 100, 100), // Progress relative to top user
+      isUser: true
+    };
+
+    // Combine and sort by points
+    const combinedLeaderboard = [...staticLeaderboard, userEntry].sort((a, b) => b.points - a.points);
+    
+    // Update ranks
+    combinedLeaderboard.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    return combinedLeaderboard;
+  };
+
+  const leaderboard = getLeaderboardWithUser();
+  const userRank = leaderboard.find(entry => entry.isUser);
+  
+  // Calculate user's actual rank even if not in main leaderboard
+  const getUserActualRank = () => {
+    if (!userDashboardData) return null;
+    
+    const userPoints = userDashboardData.ecoStats.totalPoints;
+    if (userPoints === 0) return null;
+    
+    // Count how many users have more points
+    const staticLeaderboard = [1245, 1120, 980, 875, 820, 790, 745, 680];
+    const betterUsers = staticLeaderboard.filter(points => points > userPoints).length;
+    
+    return {
+      rank: betterUsers + 1,
+      points: userPoints,
+      progress: Math.min((userPoints / 1245) * 100, 100)
+    };
+  };
+
+  const userActualRank = getUserActualRank();
+
+  // Fetch user dashboard data for dynamic ranking
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await api.get('/eco/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        setUserDashboardData(response.data);
+      } catch (error) {
+        console.error('Error fetching user dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isAuthenticated]);
 
   // Challenges data
   const challenges = [
@@ -63,6 +151,12 @@ const Community = () => {
   ];
 
   const joinChallenge = (title) => {
+    if (!isAuthenticated) {
+      // Redirect to login if not authenticated
+      window.location.href = '/login';
+      return;
+    }
+    
     if (!joinedChallenges.includes(title)) {
       setJoinedChallenges([...joinedChallenges, title]);
     }
@@ -169,97 +263,180 @@ const Community = () => {
                   </h2>
                   <p className="text-gray-600 mt-1">
                     Top eco-champions making the biggest impact this month
+                    {isAuthenticated && userRank && (
+                      <span className="text-blue-600 font-medium ml-2">
+                        • Your rank: #{userRank.rank}
+                      </span>
+                    )}
                   </p>
                 </div>
-                
-                <div className="divide-y divide-gray-200">
-                  {leaderboard.map((user, index) => (
-                    <motion.div
-                      key={user.name}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`p-4 flex items-center ${
-                        index < 3 ? "bg-gradient-to-r from-emerald-50 to-teal-50" : ""
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                        index === 0 ? "bg-yellow-100 text-yellow-600" :
-                        index === 1 ? "bg-gray-200 text-gray-600" :
-                        index === 2 ? "bg-orange-100 text-orange-600" :
-                        "bg-gray-100 text-gray-500"
-                      }`}>
-                        {index <= 2 ? (
-                          ["🥇", "🥈", "🥉"][index]
-                        ) : (
-                          user.rank
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center">
-                          <span className="text-2xl mr-3">{user.avatar}</span>
-                          <div>
-                            <h3 className="font-medium">{user.name}</h3>
-                            <div className="flex items-center text-sm text-gray-500">
-                              <FiAward className="mr-1" /> {user.points} EcoPoints
+                  {isLoading && isAuthenticated ? (
+                  <div className="p-8 text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading your position...</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="divide-y divide-gray-200">
+                      {leaderboard.map((user, index) => (
+                        <motion.div
+                          key={user.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className={`p-4 flex items-center ${
+                            index < 3 ? "bg-gradient-to-r from-emerald-50 to-teal-50" : ""
+                          } ${user.isUser ? "bg-gradient-to-r from-blue-50 to-emerald-50 border-l-4 border-blue-500" : ""}`}
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
+                            index === 0 ? "bg-yellow-100 text-yellow-600" :
+                            index === 1 ? "bg-gray-200 text-gray-600" :
+                            index === 2 ? "bg-orange-100 text-orange-600" :
+                            user.isUser ? "bg-blue-100 text-blue-600" :
+                            "bg-gray-100 text-gray-500"
+                          }`}>
+                            {index <= 2 ? (
+                              ["🥇", "🥈", "🥉"][index]
+                            ) : (
+                              user.rank
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <span className="text-2xl mr-3">{user.avatar}</span>
+                              <div>
+                                <h3 className={`font-medium ${user.isUser ? "text-blue-700" : ""}`}>
+                                  {user.name} {user.isUser ? "(You)" : ""}
+                                </h3>
+                                <div className="flex items-center text-sm text-gray-500">
+                                  <FiAward className="mr-1" /> {user.points} EcoPoints
+                                  {user.isUser && !isLoading && (
+                                    <span className="ml-2 text-blue-600 font-medium">• Live</span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
+                          <div className="w-24">
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full ${
+                                  index === 0 ? "bg-yellow-400" :
+                                  index === 1 ? "bg-gray-400" :
+                                  index === 2 ? "bg-orange-400" :
+                                  user.isUser ? "bg-blue-400" :
+                                  "bg-emerald-400"
+                                }`}
+                                style={{ width: `${user.progress}%` }}
+                              ></div>
+                            </div>
+                            <div className="text-xs text-gray-500 text-right mt-1">
+                              {user.progress.toFixed(0)}%
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    <div className="p-4 bg-gray-50 text-center">
+                      <button className="text-emerald-600 font-medium hover:text-emerald-800">
+                        View Full Leaderboard →
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Your Position - Only show when logged in */}
+              {isAuthenticated ? (
+                <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+                  <h3 className="font-bold text-lg mb-4 flex items-center">
+                    <span className="bg-emerald-100 text-emerald-800 w-8 h-8 rounded-full flex items-center justify-center mr-3">🌟</span>
+                    Your Position
+                  </h3>
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+                      <span className="ml-2 text-gray-600">Loading your stats...</span>
+                    </div>
+                  ) : userRank || userActualRank ? (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <span className="text-2xl mr-4">👋</span>
+                        <div>
+                          <h4 className="font-medium">{user?.name || 'EcoHero'} (You)</h4>
+                          <p className="text-sm text-gray-600">
+                            Rank #{(userRank?.rank || userActualRank?.rank)} with {(userRank?.points || userActualRank?.points)} points
+                          </p>
+                          {userDashboardData && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              Streak: {userDashboardData.ecoStats.streakDays} days • 
+                              Activities: {userDashboardData.ecoStats.activitiesLogged}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="w-24">
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className={`h-full ${
-                              index === 0 ? "bg-yellow-400" :
-                              index === 1 ? "bg-gray-400" :
-                              index === 2 ? "bg-orange-400" :
-                              "bg-emerald-400"
-                            }`}
-                            style={{ width: `${user.progress}%` }}
+                            className="h-full bg-emerald-400" 
+                            style={{ width: `${(userRank?.progress || userActualRank?.progress)}%` }}
                           ></div>
                         </div>
                         <div className="text-xs text-gray-500 text-right mt-1">
-                          {user.progress}%
+                          {((userRank?.progress || userActualRank?.progress) || 0).toFixed(0)}% to top
                         </div>
                       </div>
-                    </motion.div>
-                  ))}
+                    </div>
+                  ) : userDashboardData && userDashboardData.ecoStats.totalPoints === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-4">🌱</div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Ready to make an impact?</h4>
+                      <p className="text-gray-600 mb-4">
+                        You haven't earned any EcoPoints yet. Start logging activities to climb the leaderboard!
+                      </p>
+                      <button 
+                        onClick={() => window.location.href = '/how-it-works'}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                      >
+                        Start Earning Points
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-4">🌱</div>
+                      <p className="text-gray-600 mb-2">Start your eco-journey!</p>
+                      <p className="text-sm text-gray-500">
+                        Complete activities in "How It Works" to earn points and climb the leaderboard.
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="p-4 bg-gray-50 text-center">
-                  <button className="text-emerald-600 font-medium hover:text-emerald-800">
-                    View Full Leaderboard →
-                  </button>
-                </div>
-              </div>
-
-              {/* Your Position */}
-              <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center">
-                  <span className="bg-emerald-100 text-emerald-800 w-8 h-8 rounded-full flex items-center justify-center mr-3">🌟</span>
-                  Your Position
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-4">👋</span>
-                    <div>
-                      <h4 className="font-medium">EcoHero (You)</h4>
-                      <p className="text-sm text-gray-600">Rank #42 with 645 points</p>
+              ) : (
+                <div className="mt-8 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl shadow-lg p-6 border border-emerald-200">
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">🏆</div>
+                    <h3 className="font-bold text-lg mb-2">Want to see your ranking?</h3>
+                    <p className="text-gray-600 mb-4">
+                      Join EcoPulse to track your progress, earn points, and compete with eco-warriors worldwide!
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button 
+                        onClick={() => window.location.href = '/register'}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                      >
+                        Join Now - Free
+                      </button>
+                      <button 
+                        onClick={() => window.location.href = '/login'}
+                        className="px-6 py-2 border border-emerald-600 text-emerald-600 rounded-lg font-medium hover:bg-emerald-50 transition-colors"
+                      >
+                        Sign In
+                      </button>
                     </div>
                   </div>
-                  <div className="w-24">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-emerald-400" 
-                        style={{ width: "52%" }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-gray-500 text-right mt-1">
-                      52% to next level
-                    </div>
-                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           )}
 
@@ -312,7 +489,7 @@ const Community = () => {
                           onClick={() => joinChallenge(challenge.title)}
                           className="w-full py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-all"
                         >
-                          Join Challenge
+                          {isAuthenticated ? "Join Challenge" : "Login to Join Challenge"}
                         </motion.button>
                       )}
                     </div>
@@ -320,35 +497,66 @@ const Community = () => {
                 ))}
               </div>
               
-              <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center">
-                  <span className="bg-emerald-100 text-emerald-800 w-8 h-8 rounded-full flex items-center justify-center mr-3">🏆</span>
-                  Your Active Challenges
-                </h3>
-                {joinedChallenges.length > 0 ? (
-                  <div className="space-y-4">
-                    {challenges
-                      .filter(c => joinedChallenges.includes(c.title))
-                      .map(challenge => (
-                        <div key={challenge.id} className="flex items-center p-3 border border-gray-200 rounded-lg">
-                          <div className="bg-emerald-100 text-emerald-800 p-2 rounded-lg mr-4">
-                            {challenge.category === "waste" ? "🗑️" : 
-                             challenge.category === "transport" ? "🚲" : "🍎"}
+              {/* Your Active Challenges - Only show when logged in */}
+              {isAuthenticated ? (
+                <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+                  <h3 className="font-bold text-lg mb-4 flex items-center">
+                    <span className="bg-emerald-100 text-emerald-800 w-8 h-8 rounded-full flex items-center justify-center mr-3">🏆</span>
+                    Your Active Challenges
+                  </h3>
+                  {joinedChallenges.length > 0 ? (
+                    <div className="space-y-4">
+                      {challenges
+                        .filter(c => joinedChallenges.includes(c.title))
+                        .map(challenge => (
+                          <div key={challenge.id} className="flex items-center p-3 border border-gray-200 rounded-lg">
+                            <div className="bg-emerald-100 text-emerald-800 p-2 rounded-lg mr-4">
+                              {challenge.category === "waste" ? "🗑️" : 
+                               challenge.category === "transport" ? "🚲" : "🍎"}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-medium">{challenge.title}</h4>
+                              <p className="text-sm text-gray-600">Progress: 25%</p>
+                            </div>
+                            <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-emerald-500" style={{ width: "25%" }}></div>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium">{challenge.title}</h4>
-                            <p className="text-sm text-gray-600">Progress: 25%</p>
-                          </div>
-                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-500" style={{ width: "25%" }}></div>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-6xl mb-4">🎯</div>
+                      <p className="text-gray-600 mb-4">You haven't joined any challenges yet.</p>
+                      <p className="text-sm text-gray-500">Join a challenge above to start tracking your progress!</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-8 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl shadow-lg p-6 border border-blue-200">
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">🎯</div>
+                    <h3 className="font-bold text-lg mb-2">Ready to take on challenges?</h3>
+                    <p className="text-gray-600 mb-4">
+                      Sign up to join challenges, track your progress, and earn exclusive badges!
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <button 
+                        onClick={() => window.location.href = '/register'}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                      >
+                        Get Started
+                      </button>
+                      <button 
+                        onClick={() => window.location.href = '/login'}
+                        className="px-6 py-2 border border-emerald-600 text-emerald-600 rounded-lg font-medium hover:bg-emerald-50 transition-colors"
+                      >
+                        Already a member?
+                      </button>
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-gray-600">You haven't joined any challenges yet.</p>
-                )}
-              </div>
+                </div>
+              )}
             </motion.div>
           )}
 
