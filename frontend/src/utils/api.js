@@ -1,12 +1,12 @@
 import axios from "axios";
 
-// For Netlify deployment, API calls go to same domain
+// For Netlify deployment, API calls go to individual functions
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? `${window.location.origin}` // Use current domain in production
-  : "http://localhost:8888"; // Netlify dev server in development
+  ? `${window.location.origin}/.netlify/functions` // Individual functions
+  : "http://localhost:8888/api"; // Netlify dev server in development
 
 const instance = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 10000, // 10 second timeout
 });
