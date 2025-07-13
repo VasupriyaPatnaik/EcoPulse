@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
+import ecoRoutes from './routes/ecoRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/eco', ecoRoutes);
 
 app.get('/', (req, res) => {
   res.send('EcoPulse API running...');
