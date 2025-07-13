@@ -1,4 +1,5 @@
 <div align="center">
+   
 # 🌱 EcoPulse
 ### Your Personal Sustainable Living Companion
 
