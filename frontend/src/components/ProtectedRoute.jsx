@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   // Show loading state while checking authentication
   if (isLoading) {

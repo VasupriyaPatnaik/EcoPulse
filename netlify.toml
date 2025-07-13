@@ -1,6 +1,6 @@
 [build]
   publish = "frontend/build"
-  command = "npm run build"
+  command = "cd frontend && npm run build:ci"
   functions = "netlify/functions"
 
 [build.environment]

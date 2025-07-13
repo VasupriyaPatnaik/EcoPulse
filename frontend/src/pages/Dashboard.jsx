@@ -139,7 +139,7 @@ export default function Dashboard() {
     };
 
     stats.forEach((stat, index) => increment(stat, index));
-  }, [isLoading, stats.length]); // Updated dependency
+  }, [isLoading]); // Removed stats dependency to prevent infinite loop
 
   // Badges with unlock status - now using dynamic data
   const badges = dashboardData.badges;
