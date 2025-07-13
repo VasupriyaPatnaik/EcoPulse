@@ -13,7 +13,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // React app URL
+  origin: [
+    'http://localhost:3000', // Local development
+    'https://ecopulsetrackr.netlify.app', // Production frontend
+    /https:\/\/.*--ecopulsetrackr\.netlify\.app/ // Deploy previews
+  ],
   credentials: true
 }));
 app.use(express.json());
