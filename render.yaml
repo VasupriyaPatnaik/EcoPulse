@@ -2,8 +2,9 @@ services:
   - type: web
     name: ecopulse-backend
     env: node
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
