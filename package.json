@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "EcoPulse - Full Stack on Netlify",
   "scripts": {
-    "build": "npm run build:frontend",
+    "start": "cd backend && npm start",
+    "build": "cd backend && npm install",
     "build:frontend": "cd frontend && npm install && npm run build",
     "dev": "netlify dev",
     "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install"
