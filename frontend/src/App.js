@@ -15,6 +15,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 
 function App() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ function App() {
   };
 
   // Pages that have their own Navbar and shouldn't use the global one
-  const pagesWithOwnNavbar = ['/', '/login', '/register'];
+  const pagesWithOwnNavbar = ['/', '/login', '/register', '/forgot-password'];
   const showGlobalNavbar = !pagesWithOwnNavbar.includes(location.pathname);
 
   return (
@@ -41,6 +42,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/community" element={<Community />} />
               <Route path="/about" element={<About />} />
