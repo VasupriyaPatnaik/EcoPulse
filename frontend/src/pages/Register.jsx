@@ -185,9 +185,9 @@ export default function RegisterPage() {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
-                ) : (
                   <FiEye className="text-gray-400 hover:text-emerald-400" />
+                ) : (
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
                 )}
               </button>
             </div>
@@ -222,9 +222,9 @@ export default function RegisterPage() {
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
-                ) : (
                   <FiEye className="text-gray-400 hover:text-emerald-400" />
+                ) : (
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
                 )}
               </button>
             </div>
