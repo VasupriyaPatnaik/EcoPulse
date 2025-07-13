@@ -38,18 +38,50 @@ app.use(cors({
 app.use(express.json());
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'EcoPulse API is running on Netlify Functions!',
-    timestamp: new Date().toISOString()
-  });
+app.get('/health', async (req, res) => {
+  try {
+    const dbStatus = mongoose.connections[0].readyState === 1 ? 'Connected' : 'Disconnected';
+    const envCheck = {
+      mongodb: !!process.env.MONGODB_URI,
+      jwt: !!process.env.JWT_SECRET,
+      email: !!process.env.EMAIL_USER && !!process.env.EMAIL_PASS
+    };
+    
+    res.json({ 
+      status: 'OK', 
+      message: 'EcoPulse API is running on Netlify Functions!',
+      database: dbStatus,
+      environment: envCheck,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'Error',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Auth Routes
 app.post('/auth/register', async (req, res) => {
   try {
+    console.log('Registration attempt:', { body: req.body });
+    
     const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ 
+        message: 'Name, email, and password are required',
+        received: { name: !!name, email: !!email, password: !!password }
+      });
+    }
+
+    // Check database connection
+    if (mongoose.connections[0].readyState !== 1) {
+      console.error('Database not connected');
+      return res.status(500).json({ message: 'Database connection error' });
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -68,6 +100,7 @@ app.post('/auth/register', async (req, res) => {
     });
 
     await user.save();
+    console.log('User created successfully:', user.email);
 
     // Generate JWT
     const token = jwt.sign(
@@ -93,19 +126,38 @@ app.post('/auth/register', async (req, res) => {
 
 app.post('/auth/login', async (req, res) => {
   try {
+    console.log('Login attempt:', { email: req.body.email });
+    
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required',
+        received: { email: !!email, password: !!password }
+      });
+    }
+
+    // Check database connection
+    if (mongoose.connections[0].readyState !== 1) {
+      console.error('Database not connected');
+      return res.status(500).json({ message: 'Database connection error' });
+    }
 
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      console.log('Invalid password for user:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    console.log('Login successful for user:', email);
 
     // Generate JWT
     const token = jwt.sign(
