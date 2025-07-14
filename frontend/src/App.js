@@ -28,6 +28,10 @@ function App() {
   // Pages that have their own Navbar and shouldn't use the global one
   const pagesWithOwnNavbar = ['/', '/login', '/register', '/forgot-password'];
   const showGlobalNavbar = !pagesWithOwnNavbar.includes(location.pathname);
+  
+  // Pages that have their own Footer and shouldn't use the global one
+  const pagesWithOwnFooter = ['/', '/login', '/register', '/forgot-password'];
+  const showGlobalFooter = !pagesWithOwnFooter.includes(location.pathname);
 
   return (
     <DashboardProvider>
@@ -66,7 +70,9 @@ function App() {
           </Suspense>
         </main>
         
-        <Footer />
+        {showGlobalFooter && (
+          <Footer />
+        )}
       </div>
     </DashboardProvider>
   );
