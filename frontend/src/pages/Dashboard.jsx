@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { FiTrendingUp, FiDroplet, FiZap, FiAward, FiCalendar, FiBarChart2 } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
@@ -21,13 +21,7 @@ export default function Dashboard() {
     return new Date(date).getDay(); // 0 = Sunday, 1 = Monday, etc.
   };
 
-  const isToday = (date) => {
-    const today = new Date();
-    const checkDate = new Date(date);
-    return today.toDateString() === checkDate.toDateString();
-  };
-
-  const calculateWeeklyStreak = (activities) => {
+  const calculateWeeklyStreak = useCallback((activities) => {
     if (!activities || activities.length === 0) {
       return { streakDays: 0, weeklyActivityDays: [] };
     }
@@ -79,7 +73,7 @@ export default function Dashboard() {
       streakDays,
       weeklyActivityDays: uniqueDays.map(day => getDayOfWeek(new Date(day)))
     };
-  };
+  }, []); // Empty dependency array since it doesn't depend on any props or state
   
   // Dynamic state for real user data
   const [dashboardData, setDashboardData] = useState({
@@ -204,7 +198,7 @@ export default function Dashboard() {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, isLoading, refreshTrigger]); // Add refreshTrigger to dependencies
+  }, [user, isLoading, refreshTrigger, calculateWeeklyStreak]); // Add calculateWeeklyStreak to dependencies
 
   // Effect to check for date changes and update streak
   useEffect(() => {
@@ -254,7 +248,7 @@ export default function Dashboard() {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, isLoading, dashboardData.recentActivities]); // Dependencies for date checking
+  }, [user, isLoading, dashboardData.recentActivities, calculateWeeklyStreak]); // Add calculateWeeklyStreak to dependencies
 
   // Animated counter effect
   useEffect(() => {
@@ -281,7 +275,8 @@ export default function Dashboard() {
     };
 
     stats.forEach((stat, index) => increment(stat, index));
-  }, [isLoading]); // Removed stats dependency to prevent infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading]); // Intentionally excluding stats to prevent infinite loop
 
   // Badges with unlock status - now using dynamic data
   const badges = dashboardData.badges;
