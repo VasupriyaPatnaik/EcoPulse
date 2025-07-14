@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiActivity, FiList, FiAward, FiBarChart2, FiCheckCircle } from "react-icons/fi";
+import { FiActivity, FiList, FiAward, FiBarChart2, FiCheckCircle, FiLock } from "react-icons/fi";
 import { useDashboard } from "../context/DashboardContext";
+import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 
 const HowItWorks = () => {
   const { triggerDashboardRefresh } = useDashboard();
+  const { isAuthenticated, user } = useAuth();
   const [activeStep, setActiveStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedActivity, setSelectedActivity] = useState(null);
@@ -54,25 +56,44 @@ const HowItWorks = () => {
     ],
   };
 
-  const Step = ({ number, title, active, completed, onClick }) => (
+  const Step = ({ number, title, active, completed, onClick, locked = false }) => (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={onClick}
-      className={`flex items-center cursor-pointer p-4 rounded-xl ${
-        active ? "bg-emerald-100 border-l-4 border-emerald-500" : 
-        completed ? "bg-gray-100" : "bg-white"
+      whileHover={!locked ? { scale: 1.05 } : {}}
+      whileTap={!locked ? { scale: 0.95 } : {}}
+      onClick={!locked ? onClick : undefined}
+      className={`flex items-center p-4 rounded-xl ${
+        locked 
+          ? "bg-gray-100 cursor-not-allowed opacity-60" 
+          : active 
+            ? "bg-emerald-100 border-l-4 border-emerald-500 cursor-pointer" 
+            : completed 
+              ? "bg-gray-100 cursor-pointer" 
+              : "bg-white cursor-pointer"
       } shadow-sm mb-4 transition-all`}
     >
       <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
-        active ? "bg-emerald-500 text-white" : 
-        completed ? "bg-gray-300 text-white" : "bg-gray-200"
+        locked
+          ? "bg-gray-300 text-gray-500"
+          : active 
+            ? "bg-emerald-500 text-white" 
+            : completed 
+              ? "bg-gray-300 text-white" 
+              : "bg-gray-200"
       }`}>
-        {completed ? <FiCheckCircle className="text-lg" /> : number}
+        {locked ? <FiLock className="text-sm" /> : completed ? <FiCheckCircle className="text-lg" /> : number}
       </div>
       <h3 className={`font-medium ${
-        active ? "text-emerald-700" : "text-gray-700"
+        locked 
+          ? "text-gray-400"
+          : active 
+            ? "text-emerald-700" 
+            : "text-gray-700"
       }`}>{title}</h3>
+      {locked && (
+        <span className="ml-auto text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+          Login Required
+        </span>
+      )}
     </motion.div>
   );
 
@@ -230,35 +251,91 @@ const HowItWorks = () => {
                 title="Choose Category" 
                 active={activeStep === 1} 
                 completed={activeStep > 1}
-                onClick={() => setActiveStep(1)}
+                locked={!isAuthenticated}
+                onClick={() => isAuthenticated && setActiveStep(1)}
               />
               <Step 
                 number={2} 
                 title="Select Activity" 
                 active={activeStep === 2} 
                 completed={activeStep > 2}
-                onClick={() => selectedCategory && setActiveStep(2)}
+                locked={!isAuthenticated}
+                onClick={() => isAuthenticated && selectedCategory && setActiveStep(2)}
               />
               <Step 
                 number={3} 
                 title="Log Details" 
                 active={activeStep === 3} 
                 completed={activeStep > 3}
-                onClick={() => selectedCategory && setActiveStep(3)}
+                locked={!isAuthenticated}
+                onClick={() => isAuthenticated && selectedCategory && setActiveStep(3)}
               />
               <Step 
                 number={4} 
                 title="See Impact" 
                 active={activeStep === 4} 
                 completed={false}
-                onClick={() => selectedCategory && setActiveStep(4)}
+                locked={!isAuthenticated}
+                onClick={() => isAuthenticated && selectedCategory && setActiveStep(4)}
               />
             </div>
 
             {/* Step Content */}
             <div className="md:col-span-3 bg-white rounded-xl shadow-lg p-8">
-              {/* Step 1: Choose Category */}
-              {activeStep === 1 && (
+              {/* Login Required Message */}
+              {!isAuthenticated && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center py-16"
+                >
+                  <div className="p-4 bg-emerald-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    <FiLock className="text-emerald-600 text-3xl" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h2>
+                  <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                    To track your eco-activities and see your environmental impact, please log in to your account or create a new one.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => navigate('/login')}
+                      className="px-8 py-3 bg-emerald-600 text-white rounded-lg font-bold shadow-md hover:bg-emerald-700 transition-all"
+                    >
+                      Login to Your Account
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => navigate('/register')}
+                      className="px-8 py-3 border-2 border-emerald-600 text-emerald-600 rounded-lg font-bold hover:bg-emerald-50 transition-all"
+                    >
+                      Create New Account
+                    </motion.button>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-6">
+                    Ready to start your eco-journey? Create an account to track your environmental impact!
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Authenticated User Content */}
+              {isAuthenticated && (
+                <>
+                  {/* Welcome Message for Logged-in Users */}
+                  <div className="mb-6 p-4 bg-emerald-50 rounded-lg border-l-4 border-emerald-500">
+                    <h3 className="font-semibold text-emerald-800 mb-1">
+                      Welcome back, {user?.name || 'Eco-Warrior'}! 🌱
+                    </h3>
+                    <p className="text-emerald-700 text-sm">
+                      Ready to log your eco-activities? Follow the steps below to track your environmental impact.
+                    </p>
+                  </div>
+
+                  {/* Step 1: Choose Category */}
+                  {activeStep === 1 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -280,8 +357,12 @@ const HowItWorks = () => {
                         whileHover={{ y: -5 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => {
-                          setSelectedCategory(category.name);
-                          setActiveStep(2);
+                          if (isAuthenticated) {
+                            setSelectedCategory(category.name);
+                            setActiveStep(2);
+                          } else {
+                            navigate('/login');
+                          }
                         }}
                         className={`p-4 rounded-xl text-center cursor-pointer border-2 ${
                           selectedCategory === category.name 
@@ -319,8 +400,12 @@ const HowItWorks = () => {
                         key={index}
                         whileHover={{ x: 5 }}
                         onClick={() => {
-                          setSelectedActivity(activity);
-                          setActiveStep(3);
+                          if (isAuthenticated) {
+                            setSelectedActivity(activity);
+                            setActiveStep(3);
+                          } else {
+                            navigate('/login');
+                          }
                         }}
                         className={`p-4 border rounded-lg cursor-pointer transition-all ${
                           selectedActivity?.name === activity.name
@@ -388,8 +473,14 @@ const HowItWorks = () => {
                     <motion.button
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.97 }}
-                      onClick={calculateImpact}
-                      disabled={isCalculating}
+                      onClick={() => {
+                        if (isAuthenticated) {
+                          calculateImpact();
+                        } else {
+                          navigate('/login');
+                        }
+                      }}
+                      disabled={isCalculating || !isAuthenticated}
                       className="w-full py-4 bg-emerald-600 text-white rounded-lg font-bold shadow-md hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isCalculating ? (
@@ -475,6 +566,8 @@ const HowItWorks = () => {
                     </div>
                   </div>
                 </motion.div>
+              )}
+              </>
               )}
             </div>
           </div>
@@ -568,13 +661,15 @@ const HowItWorks = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => isAuthenticated ? navigate('/dashboard') : navigate('/login')}
               className="px-8 py-3 bg-white text-emerald-700 rounded-full font-bold shadow-lg hover:shadow-xl transition-all"
             >
-              Get Started - It's Free
+              {isAuthenticated ? "Go to Dashboard" : "Get Started - It's Free"}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="px-8 py-3 border-2 border-white text-white rounded-full font-bold hover:bg-white hover:bg-opacity-10 transition-all"
             >
               See How It Works
