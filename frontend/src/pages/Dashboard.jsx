@@ -8,6 +8,78 @@ import api from "../utils/api";
 export default function Dashboard() {
   const { user } = useAuth();
   const { refreshTrigger } = useDashboard();
+
+  // Utility functions for streak calculation
+  const getStartOfWeek = (date = new Date()) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day; // Sunday is 0, so this gets the Sunday of the week
+    return new Date(d.setDate(diff));
+  };
+
+  const getDayOfWeek = (date) => {
+    return new Date(date).getDay(); // 0 = Sunday, 1 = Monday, etc.
+  };
+
+  const isToday = (date) => {
+    const today = new Date();
+    const checkDate = new Date(date);
+    return today.toDateString() === checkDate.toDateString();
+  };
+
+  const calculateWeeklyStreak = (activities) => {
+    if (!activities || activities.length === 0) {
+      return { streakDays: 0, weeklyActivityDays: [] };
+    }
+
+    // Get current week start (Sunday)
+    const weekStart = getStartOfWeek();
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6); // Saturday
+
+    // Filter activities from this week and get unique days
+    const thisWeekActivities = activities.filter(activity => {
+      const activityDate = new Date(activity.timestamp);
+      return activityDate >= weekStart && activityDate <= weekEnd;
+    });
+
+    // Get unique days when activities were logged
+    const uniqueDays = [...new Set(
+      thisWeekActivities.map(activity => 
+        new Date(activity.timestamp).toDateString()
+      )
+    )];
+
+    // Calculate consecutive days from start of week
+    let streakDays = 0;
+    const today = new Date();
+    const currentDayOfWeek = today.getDay();
+
+    // Check each day from Sunday to today
+    for (let i = 0; i <= currentDayOfWeek; i++) {
+      const checkDate = new Date(weekStart);
+      checkDate.setDate(weekStart.getDate() + i);
+      
+      const hasActivity = uniqueDays.some(day => 
+        new Date(day).toDateString() === checkDate.toDateString()
+      );
+
+      if (hasActivity) {
+        streakDays++;
+      } else {
+        // If there's a gap, reset streak (but only count up to yesterday)
+        // Don't break streak if today hasn't been completed yet
+        if (checkDate.toDateString() !== today.toDateString()) {
+          streakDays = 0;
+        }
+      }
+    }
+
+    return {
+      streakDays,
+      weeklyActivityDays: uniqueDays.map(day => getDayOfWeek(new Date(day)))
+    };
+  };
   
   // Dynamic state for real user data
   const [dashboardData, setDashboardData] = useState({
@@ -17,7 +89,9 @@ export default function Dashboard() {
       waterSaved: 0,
       energySaved: 0,
       activitiesLogged: 0,
-      streakDays: 0
+      streakDays: 0,
+      lastActivityDate: null,
+      weeklyActivityDays: [] // Array of dates when activities were logged this week
     },
     recentActivities: [],
     badges: [],
@@ -49,10 +123,28 @@ export default function Dashboard() {
           }
         });
         
-        setDashboardData(response.data);
+        const responseData = response.data;
+        
+        // Calculate weekly streak from activities
+        const streakData = calculateWeeklyStreak(responseData.recentActivities);
+        
+        // Update dashboard data with calculated streak
+        const updatedData = {
+          ...responseData,
+          ecoStats: {
+            ...responseData.ecoStats,
+            streakDays: streakData.streakDays,
+            weeklyActivityDays: streakData.weeklyActivityDays,
+            lastActivityDate: responseData.recentActivities.length > 0 
+              ? responseData.recentActivities[0].timestamp 
+              : null
+          }
+        };
+        
+        setDashboardData(updatedData);
         
         // Update stats with real data
-        const { ecoStats } = response.data;
+        const { ecoStats } = updatedData;
         setStats([
           { 
             label: "CO₂ Saved", 
@@ -113,6 +205,56 @@ export default function Dashboard() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user, isLoading, refreshTrigger]); // Add refreshTrigger to dependencies
+
+  // Effect to check for date changes and update streak
+  useEffect(() => {
+    if (!user || isLoading) return;
+
+    const checkDateChange = () => {
+      const now = new Date();
+      const lastCheck = localStorage.getItem('lastStreakCheck');
+      const today = now.toDateString();
+
+      // If it's a new day, recalculate the streak
+      if (lastCheck !== today) {
+        localStorage.setItem('lastStreakCheck', today);
+        
+        // Recalculate streak with current activities
+        if (dashboardData.recentActivities.length > 0) {
+          const streakData = calculateWeeklyStreak(dashboardData.recentActivities);
+          
+          setDashboardData(prev => ({
+            ...prev,
+            ecoStats: {
+              ...prev.ecoStats,
+              streakDays: streakData.streakDays,
+              weeklyActivityDays: streakData.weeklyActivityDays
+            }
+          }));
+        }
+      }
+    };
+
+    // Check immediately
+    checkDateChange();
+
+    // Set up interval to check every minute for date changes
+    const interval = setInterval(checkDateChange, 60000);
+
+    // Also check when the page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        checkDateChange();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user, isLoading, dashboardData.recentActivities]); // Dependencies for date checking
 
   // Animated counter effect
   useEffect(() => {
