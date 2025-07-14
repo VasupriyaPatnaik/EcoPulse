@@ -12,7 +12,7 @@
 **Transform your daily habits into meaningful environmental impact**  
 *Track • Compete • Achieve • Make a Difference* 🌍
 
-[🚀 Live Demo](https://ecopulsetrackr.netlify.app/) • [📖 Documentation](https://docs.google.com/document/d/1vyWvu0ivqLy-IQ5lDwI8TFk2dyGHvlBm/edit?usp=sharing&ouid=108418581556305643665&rtpof=true&sd=true) • [🐛 Report Bug](https://github.com/VasupriyaPatnaik/EcoPulse/issues) • [💡 Request Feature](https://github.com/VasupriyaPatnaik/EcoPulse/issues)
+[🚀 Live Demo](#) • [📖 Documentation](https://docs.google.com/document/d/1vyWvu0ivqLy-IQ5lDwI8TFk2dyGHvlBm/edit?usp=sharing&ouid=108418581556305643665&rtpof=true&sd=true) • [🐛 Report Bug](https://github.com/VasupriyaPatnaik/EcoPulse/issues) • [💡 Request Feature](https://github.com/VasupriyaPatnaik/EcoPulse/issues)
 
 </div>
 
@@ -226,69 +226,24 @@ npm run eject      # Eject from Create React App
 
 ## 🚀 Deployment
 
-### Current Deployment Strategy
+### Option 1: Render (Recommended)
 
-EcoPulse uses a **separated frontend/backend deployment** for optimal performance and reliability:
+**Backend Deployment:**
+1. Connect your GitHub repository to Render
+2. Create a new Web Service
+3. Set root directory to `backend`
+4. Build command: `npm install`
+5. Start command: `npm start`
+6. Add environment variables in Render dashboard
 
-**🎯 Live Application:**
-- **Frontend**: [https://ecopulsetrackr.netlify.app/](https://ecopulsetrackr.netlify.app/) (Netlify)
-- **Backend**: [https://ecopulse-backend-lrsh.onrender.com/](https://ecopulse-backend-lrsh.onrender.com/) (Render)
+**Frontend Deployment:**
+1. Create a new Static Site on Render
+2. Set root directory to `frontend`
+3. Build command: `npm run build`
+4. Publish directory: `build`
 
-### 🌐 Frontend Deployment (Netlify)
+### Option 2: Docker Deployment
 
-1. **Connect Repository to Netlify**
-   - Go to [Netlify](https://app.netlify.com)
-   - Connect your GitHub repository
-
-2. **Build Settings**
-   ```
-   Base directory: frontend
-   Build command: npm install && npm run build
-   Publish directory: build
-   ```
-
-3. **Environment Variables** (None required for frontend)
-
-4. **Deploy** - Automatic deployment on every push to `main`
-
-### ⚙️ Backend Deployment (Render)
-
-1. **Connect Repository to Render**
-   - Go to [Render](https://render.com)
-   - Create new Web Service
-   - Connect your GitHub repository
-
-2. **Build Settings**
-   ```
-   Root Directory: backend
-   Build Command: npm install
-   Start Command: npm start
-   ```
-
-3. **Environment Variables** (Required)
-   ```
-   MONGODB_URI=your_mongodb_atlas_connection_string
-   JWT_SECRET=your_jwt_secret_key
-   EMAIL_USER=your_gmail_email
-   EMAIL_PASS=your_gmail_app_password
-   NODE_ENV=production
-   ```
-
-4. **Deploy** - Automatic deployment on every push to `main`
-
-### 🔧 Alternative Deployment Options
-
-#### Option 1: Railway (Backend Alternative)
-- Similar to Render
-- Easy GitHub integration
-- Automatic deployments
-
-#### Option 2: Vercel (Frontend Alternative)
-- Great for React applications
-- Serverless functions support
-- Edge network deployment
-
-#### Option 3: Docker Deployment
 ```bash
 # Build and run with Docker Compose
 docker-compose up --build
@@ -297,14 +252,6 @@ docker-compose up --build
 docker build -t ecopulse-backend ./backend
 docker build -t ecopulse-frontend ./frontend
 ```
-
-### ✅ Benefits of Separated Deployment
-
-- **🚀 Performance**: No serverless cold starts
-- **🔧 Scalability**: Independent scaling of frontend/backend
-- **💰 Cost-Effective**: Utilize free tiers of multiple platforms
-- **🛠️ Maintainability**: Easier debugging and updates
-- **📊 Reliability**: Better uptime and error isolation
 
 ---
 
