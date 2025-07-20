@@ -26,7 +26,8 @@
 - **📊 Data-Driven Impact**: See exactly how much CO₂, water, and energy you've saved
 - **🏆 Gamification**: Earn points, unlock badges, and climb leaderboards
 - **👥 Community**: Join challenges with thousands of eco-warriors worldwide
-- **📱 User-Friendly**: Beautiful, intuitive interface built with modern web technologies
+- **📱 Mobile-First Design**: Fully responsive interface optimized for all devices
+- **🎨 User-Friendly**: Beautiful, intuitive interface built with modern web technologies
 - **🔒 Secure**: JWT authentication and secure data handling
 
 ---
@@ -64,6 +65,12 @@
 - Progress tracking over time
 - Personalized insights
 
+### 📱 **Mobile Experience**
+- Fully responsive design
+- Touch-optimized interface
+- Mobile-first navigation
+- Seamless cross-device sync
+
 </td>
 </tr>
 </table>
@@ -78,12 +85,12 @@
 |----------|------------|---------|
 | **Frontend** | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) | User Interface |
 | **Styling** | ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white) | Responsive Design |
+| **Animations** | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-black?style=flat&logo=framer&logoColor=blue) | UI Animations |
 | **Backend** | ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white) | Server Runtime |
 | **Framework** | ![Express.js](https://img.shields.io/badge/Express.js-404D59?style=flat&logo=express&logoColor=white) | Web Framework |
 | **Database** | ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat&logo=mongodb&logoColor=white) | Data Storage |
 | **Authentication** | ![JWT](https://img.shields.io/badge/JWT-black?style=flat&logo=JSON%20web%20tokens) | Secure Auth |
 | **Email** | ![Nodemailer](https://img.shields.io/badge/Nodemailer-0078D4?style=flat&logo=microsoft-outlook&logoColor=white) | Email Service |
-| **Animations** | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-black?style=flat&logo=framer&logoColor=blue) | UI Animations |
 
 </div>
 
