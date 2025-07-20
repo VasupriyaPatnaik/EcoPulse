@@ -428,18 +428,22 @@ function updateUserWeeklyStreak(ecoStats, currentDate) {
 
   const currentWeekStart = getStartOfWeek(today);
   
-  // If no weekly tracking data or it's a new week, recalculate from recent activities
+  // If no weekly tracking data or it's a new week, check from stored activity dates
   if (!ecoStats.currentWeekStart || 
       new Date(ecoStats.currentWeekStart).getTime() !== currentWeekStart.getTime()) {
     
-    // If we don't have weekly activity dates, return 0 streak
+    // Reset weekly activity dates for new week
+    ecoStats.currentWeekStart = currentWeekStart;
+    
+    // If we don't have any activity dates, return 0 streak
     if (!ecoStats.weeklyActivityDates || ecoStats.weeklyActivityDates.length === 0) {
       return { weeklyStreak: 0 };
     }
 
-    // Filter activities from current week
+    // Filter activities from current week only
     const thisWeekActivities = ecoStats.weeklyActivityDates.filter(date => {
       const activityDate = new Date(date);
+      activityDate.setHours(0, 0, 0, 0);
       return activityDate >= currentWeekStart && activityDate <= today;
     });
 
@@ -447,17 +451,21 @@ function updateUserWeeklyStreak(ecoStats, currentDate) {
     let weeklyStreak = 0;
     const currentDayOfWeek = today.getDay();
 
+    // Check each day from Sunday to today
     for (let i = 0; i <= currentDayOfWeek; i++) {
       const checkDate = new Date(currentWeekStart);
       checkDate.setDate(currentWeekStart.getDate() + i);
       
-      const hasActivity = thisWeekActivities.some(date => 
-        new Date(date).toDateString() === checkDate.toDateString()
-      );
+      const hasActivity = thisWeekActivities.some(date => {
+        const activityDate = new Date(date);
+        activityDate.setHours(0, 0, 0, 0);
+        return activityDate.getTime() === checkDate.getTime();
+      });
 
       if (hasActivity) {
         weeklyStreak++;
       } else {
+        // If there's a gap before today, reset streak
         if (checkDate.getTime() < today.getTime()) {
           weeklyStreak = 0;
         }
@@ -467,6 +475,34 @@ function updateUserWeeklyStreak(ecoStats, currentDate) {
     return { weeklyStreak };
   }
 
-  // Return existing weekly streak
-  return { weeklyStreak: ecoStats.weeklyStreak || 0 };
+  // For same week, recalculate based on existing data
+  const thisWeekActivities = (ecoStats.weeklyActivityDates || []).filter(date => {
+    const activityDate = new Date(date);
+    activityDate.setHours(0, 0, 0, 0);
+    return activityDate >= currentWeekStart && activityDate <= today;
+  });
+
+  let weeklyStreak = 0;
+  const currentDayOfWeek = today.getDay();
+
+  for (let i = 0; i <= currentDayOfWeek; i++) {
+    const checkDate = new Date(currentWeekStart);
+    checkDate.setDate(currentWeekStart.getDate() + i);
+    
+    const hasActivity = thisWeekActivities.some(date => {
+      const activityDate = new Date(date);
+      activityDate.setHours(0, 0, 0, 0);
+      return activityDate.getTime() === checkDate.getTime();
+    });
+
+    if (hasActivity) {
+      weeklyStreak++;
+    } else {
+      if (checkDate.getTime() < today.getTime()) {
+        weeklyStreak = 0;
+      }
+    }
+  }
+
+  return { weeklyStreak };
 }
