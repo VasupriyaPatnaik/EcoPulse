@@ -36,7 +36,7 @@
 
 <table>
 <tr>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 📈 **Smart Activity Tracking**
 - Log 15+ eco-friendly activities
@@ -57,7 +57,7 @@
 - Seamless cross-device sync
 
 </td>
-<td width="50%">
+<td width="50%" valign="top">
 
 ### 👥 **Community Features**
 - Join eco-challenges with others
@@ -71,7 +71,7 @@
 - Progress tracking over time
 - Personalized insights
 
-### � **Security & Reliability**
+### 🔒 **Security & Reliability**
 - JWT authentication system
 - Secure data encryption
 - Privacy-first approach
