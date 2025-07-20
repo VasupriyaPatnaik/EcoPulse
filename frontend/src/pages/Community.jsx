@@ -90,6 +90,7 @@ const Community = () => {
           }
         });
         
+        console.log('Leaderboard response:', response.data); // Debug log
         setLeaderboardData(response.data.leaderboard || []);
       } else {
         // For non-authenticated users, show static leaderboard
@@ -174,17 +175,18 @@ const Community = () => {
           }
         });
         
-        // Get the full data and calculate weekly streak
+        // Get the full data and use backend weekly streak if available
         const responseData = dashboardResponse.data;
-        const streakData = calculateWeeklyStreak(responseData.recentActivities || []);
         
-        // Update the data with calculated weekly streak
+        // Use backend weekly streak data if available, otherwise calculate frontend
         const updatedData = {
           ...responseData,
           ecoStats: {
             ...responseData.ecoStats,
-            weeklyStreakDays: streakData.streakDays,
-            weeklyActivityDays: streakData.weeklyActivityDays
+            weeklyStreakDays: responseData.ecoStats.weeklyStreak !== undefined ? 
+                             responseData.ecoStats.weeklyStreak : 
+                             calculateWeeklyStreak(responseData.recentActivities || []).streakDays,
+            weeklyActivityDays: calculateWeeklyStreak(responseData.recentActivities || []).weeklyActivityDays
           }
         };
         
@@ -204,9 +206,8 @@ const Community = () => {
       fetchData();
     } else {
       setIsLoading(false);
-      setLeaderboardLoading(false);
     }
-  }, [isAuthenticated, calculateWeeklyStreak, fetchLeaderboard]);
+  }, [isAuthenticated, calculateWeeklyStreak, fetchLeaderboard, user?.name]); // Add user?.name to refresh when user data changes
 
   // Challenges data
   const challenges = [
