@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-emerald-900 flex items-center justify-center p-3 sm:p-4">
       {/* Floating particles background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
@@ -51,8 +51,8 @@ export default function LoginPage() {
             key={i}
             className="absolute rounded-full bg-emerald-500/20"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
               width: Math.random() * 10 + 2,
               height: Math.random() * 10 + 2,
             }}
@@ -76,28 +76,28 @@ export default function LoginPage() {
         className="w-full max-w-md bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/50 shadow-xl"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-center relative">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 sm:p-6 text-center relative">
           {/* Back to Home Button */}
           <Link
             to="/"
-            className="absolute top-4 left-4 text-white/80 hover:text-white transition-colors flex items-center group"
+            className="absolute top-3 sm:top-4 left-3 sm:left-4 text-white/80 hover:text-white transition-colors flex items-center group"
           >
-            <FiArrowLeft className="mr-1 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">Home</span>
+            <FiArrowLeft className="mr-1 group-hover:-translate-x-1 transition-transform text-sm sm:text-base" />
+            <span className="text-xs sm:text-sm">Home</span>
           </Link>
           
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-20 h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
+            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
           >
-            <span className="text-3xl">🌱</span>
+            <span className="text-2xl sm:text-3xl">🌱</span>
           </motion.div>
-          <h1 className="text-2xl font-bold text-white mt-4">Welcome Back</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white mt-3 sm:mt-4">Welcome Back</h1>
           <p className="text-emerald-100">Log in to your EcoPulse account</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -113,14 +113,14 @@ export default function LoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-gray-300 mb-2">Email</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Email</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiMail className="text-gray-500" />
+                <FiMail className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type="email"
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={(e) =>
@@ -136,14 +136,14 @@ export default function LoginPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label className="block text-gray-300 mb-2">Password</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Password</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock className="text-gray-500" />
+                <FiLock className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full pl-10 pr-12 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) =>
@@ -153,21 +153,21 @@ export default function LoginPage() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400 transition-colors" />
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400 transition-colors text-sm sm:text-base" />
                 ) : (
-                  <FiEye className="text-gray-400 hover:text-emerald-400 transition-colors" />
+                  <FiEye className="text-gray-400 hover:text-emerald-400 transition-colors text-sm sm:text-base" />
                 )}
               </button>
             </div>
-            <div className="flex justify-end mt-2">
+            <div className="flex justify-end mt-1 sm:mt-2">
               <Link
                 to="/forgot-password"
-                className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -179,7 +179,7 @@ export default function LoginPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+            className={`w-full py-2.5 sm:py-3 px-4 rounded-lg font-medium transition-all text-sm sm:text-base ${
               isLoading
                 ? "bg-emerald-700 cursor-not-allowed"
                 : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
@@ -188,7 +188,7 @@ export default function LoginPage() {
             {isLoading ? (
               <>
                 <svg
-                  className="animate-spin h-5 w-5 text-white"
+                  className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -211,7 +211,7 @@ export default function LoginPage() {
               </>
             ) : (
               <>
-                <FiUser className="text-lg" />
+                <FiUser className="text-base sm:text-lg" />
                 Sign In
               </>
             )}
@@ -219,8 +219,8 @@ export default function LoginPage() {
         </form>
 
         {/* Footer */}
-        <div className="px-6 pb-6 text-center">
-          <p className="text-gray-400">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 text-center">
+          <p className="text-gray-400 text-sm">
             Don't have an account?{" "}
             <Link
               to="/register"
