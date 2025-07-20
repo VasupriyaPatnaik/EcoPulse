@@ -125,13 +125,14 @@ export default function Dashboard() {
           ...responseData,
           ecoStats: {
             ...responseData.ecoStats,
-            // Use backend weekly streak if available
-            weeklyStreakDays: responseData.ecoStats.weeklyStreak || 
+            // Prefer backend weekly streak, fallback to frontend calculation
+            weeklyStreakDays: responseData.ecoStats.weeklyStreak !== undefined ? 
+                             responseData.ecoStats.weeklyStreak : 
                              calculateWeeklyStreak(responseData.recentActivities).streakDays,
             weeklyActivityDays: calculateWeeklyStreak(responseData.recentActivities).weeklyActivityDays,
             lastActivityDate: responseData.recentActivities.length > 0 
               ? responseData.recentActivities[0].timestamp 
-              : null
+              : responseData.ecoStats.lastActivityDate
           }
         };
         
