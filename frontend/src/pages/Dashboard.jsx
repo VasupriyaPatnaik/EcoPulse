@@ -345,8 +345,8 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-gray-50 min-h-screen pt-16 sm:pt-20">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
@@ -358,16 +358,16 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-center mb-10"
+              className="text-center mb-6 sm:mb-10 px-2"
             >
-              <h1 className="text-3xl font-bold text-green-800 mb-2">
-                Welcome Back, {user?.name || 'Eco Hero'}! <span className="text-3xl">🌍</span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-green-800 mb-2">
+                Welcome Back, {user?.name || 'Eco Hero'}! <span className="text-2xl sm:text-3xl">🌍</span>
               </h1>
-              <p className="text-gray-600">Keep up the great work saving our planet!</p>
+              <p className="text-sm sm:text-base text-gray-600">Keep up the great work saving our planet!</p>
             </motion.div>
 
         {/* Stats Grid with Animated Counters */}
-        <section className="grid md:grid-cols-3 gap-6 mb-10">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
           {stats.map((item, index) => (
             <motion.div
               key={index}
@@ -375,17 +375,17 @@ export default function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -5 }}
-              className={`p-6 rounded-xl shadow-lg ${item.color} text-center`}
+              className={`p-4 sm:p-6 rounded-xl shadow-lg ${item.color} text-center`}
             >
-              <div className="flex justify-center mb-3 text-2xl">
+              <div className="flex justify-center mb-2 sm:mb-3 text-xl sm:text-2xl">
                 {item.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2">{item.label}</h3>
-              <p className="text-3xl font-bold">
+              <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{item.label}</h3>
+              <p className="text-2xl sm:text-3xl font-bold">
                 {item.value.toFixed(1)}{item.unit}
               </p>
               <ProgressBar progress={item.value} total={Math.max(item.target, 1)} />
-              <p className="text-sm mt-2 text-gray-600">
+              <p className="text-xs sm:text-sm mt-1 sm:mt-2 text-gray-600">
                 {item.target > 0 ? `${((item.value / item.target) * 100).toFixed(0)}% of monthly goal` : 'Start logging activities!'}
               </p>
             </motion.div>
@@ -393,23 +393,23 @@ export default function Dashboard() {
         </section>
 
         {/* Streaks and Points */}
-        <section className="grid md:grid-cols-2 gap-6 mb-10">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-10">
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-green-500"
+            className="p-4 sm:p-6 bg-white rounded-xl shadow-lg border-l-4 border-green-500"
           >
-            <div className="flex items-center mb-3">
-              <FiCalendar className="text-green-600 mr-2 text-xl" />
-              <h2 className="text-xl font-bold text-green-700">🔥 Weekly Streak</h2>
+            <div className="flex items-center mb-2 sm:mb-3">
+              <FiCalendar className="text-green-600 mr-2 text-lg sm:text-xl" />
+              <h2 className="text-lg sm:text-xl font-bold text-green-700">🔥 Weekly Streak</h2>
             </div>
-            <p className="mb-2">
+            <p className="mb-2 text-sm sm:text-base">
               You've logged green actions for <strong>{dashboardData.ecoStats.weeklyStreakDays || 0}</strong> consecutive days this week!
             </p>
-            <div className="flex mt-4">
+            <div className="flex mt-3 sm:mt-4 flex-wrap sm:flex-nowrap gap-1 sm:gap-2">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div
                   key={day}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${
                     day <= (dashboardData.ecoStats.weeklyStreakDays || 0) ? "bg-green-500 text-white" : "bg-gray-200"
                   }`}
                 >
@@ -421,49 +421,49 @@ export default function Dashboard() {
 
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="p-6 bg-white rounded-xl shadow-lg border-l-4 border-yellow-500"
+            className="p-4 sm:p-6 bg-white rounded-xl shadow-lg border-l-4 border-yellow-500"
           >
-            <div className="flex items-center mb-3">
-              <FiBarChart2 className="text-yellow-600 mr-2 text-xl" />
-              <h2 className="text-xl font-bold text-yellow-700">⭐ EcoPoints</h2>
+            <div className="flex items-center mb-2 sm:mb-3">
+              <FiBarChart2 className="text-yellow-600 mr-2 text-lg sm:text-xl" />
+              <h2 className="text-lg sm:text-xl font-bold text-yellow-700">⭐ EcoPoints</h2>
             </div>
-            <p className="mb-4">
+            <p className="mb-3 sm:mb-4 text-sm sm:text-base">
               Total earned: <strong>{dashboardData.ecoStats.totalPoints}</strong> points
             </p>
-            <div className="w-full bg-gray-200 rounded-full h-4">
+            <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4">
               <div
-                className="bg-yellow-500 h-4 rounded-full"
+                className="bg-yellow-500 h-3 sm:h-4 rounded-full"
                 style={{ width: `${Math.min((dashboardData.ecoStats.totalPoints / 500) * 100, 100)}%` }}
               ></div>
             </div>
-            <p className="text-sm mt-2 text-gray-600">
+            <p className="text-xs sm:text-sm mt-1 sm:mt-2 text-gray-600">
               {Math.min((dashboardData.ecoStats.totalPoints / 500) * 100, 100).toFixed(0)}% to next level (Eco Champion)
             </p>
           </motion.div>
         </section>
 
         {/* Badges with Interactive Popups */}
-        <section className="mb-10">
-          <div className="flex items-center mb-4">
-            <FiAward className="text-green-600 mr-2 text-xl" />
-            <h2 className="text-xl font-bold text-green-700">🏅 Your Badges</h2>
+        <section className="mb-6 sm:mb-10">
+          <div className="flex items-center mb-3 sm:mb-4">
+            <FiAward className="text-green-600 mr-2 text-lg sm:text-xl" />
+            <h2 className="text-lg sm:text-xl font-bold text-green-700">🏅 Your Badges</h2>
           </div>
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex gap-3 sm:gap-4 flex-wrap">
             {badges.map((badge, idx) => (
               <motion.div
                 key={idx}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`p-4 bg-white border rounded-lg shadow text-center w-40 ${
+                className={`p-3 sm:p-4 bg-white border rounded-lg shadow text-center w-32 sm:w-40 ${
                   badge.earned ? "" : "opacity-50"
                 }`}
               >
-                <div className="text-3xl mb-2">
+                <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">
                   {badge.earned ? "🏆" : "🔒"}
                 </div>
-                <p className="font-semibold">{badge.name}</p>
+                <p className="font-semibold text-sm sm:text-base">{badge.name}</p>
                 {badge.earned && (
-                  <p className="text-xs text-gray-500 mt-1">{badge.description}</p>
+                  <p className="text-xs text-gray-500 mt-1 hidden sm:block">{badge.description}</p>
                 )}
               </motion.div>
             ))}
@@ -471,8 +471,8 @@ export default function Dashboard() {
         </section>
 
         {/* Weekly Challenge with Join Button */}
-        <section className="mb-10">
-          <h2 className="text-xl font-bold text-green-700 mb-4 flex items-center">
+        <section className="mb-6 sm:mb-10">
+          <h2 className="text-lg sm:text-xl font-bold text-green-700 mb-3 sm:mb-4 flex items-center">
             <FiZap className="mr-2" /> 💪 Weekly Challenge
           </h2>
           <motion.div
