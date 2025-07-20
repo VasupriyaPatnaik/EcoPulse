@@ -34,8 +34,11 @@ const userSchema = new mongoose.Schema({
     waterSaved: { type: Number, default: 0 }, // in liters
     energySaved: { type: Number, default: 0 }, // in kWh
     activitiesLogged: { type: Number, default: 0 },
-    streakDays: { type: Number, default: 0 },
+    streakDays: { type: Number, default: 0 }, // Overall streak
+    weeklyStreak: { type: Number, default: 0 }, // Weekly streak (0-7)
     lastActivityDate: { type: Date, default: null },
+    currentWeekStart: { type: Date, default: null }, // Start of current week
+    weeklyActivityDates: [{ type: Date }], // Dates when activities were logged this week
   },
   // Recent activities
   recentActivities: [{
