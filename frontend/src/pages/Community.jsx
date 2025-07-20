@@ -279,13 +279,13 @@ const Community = () => {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-emerald-50 min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-bold mb-6"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6"
           >
             EcoPulse <span className="text-emerald-200">Community</span>
           </motion.h1>
@@ -293,7 +293,7 @@ const Community = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="text-xl max-w-3xl mx-auto"
+            className="text-lg sm:text-xl max-w-3xl mx-auto px-2"
           >
             Join thousands of eco-warriors making a difference together
           </motion.p>
@@ -301,46 +301,46 @@ const Community = () => {
       </section>
 
       {/* Tabs Navigation */}
-      <section className="pt-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex border-b border-gray-200">
+      <section className="pt-8 sm:pt-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="flex border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => setActiveTab("leaderboard")}
-              className={`px-6 py-3 font-medium text-lg flex items-center ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-lg flex items-center whitespace-nowrap ${
                 activeTab === "leaderboard"
                   ? "text-emerald-600 border-b-2 border-emerald-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <FiTrendingUp className="mr-2" /> Leaderboard
+              <FiTrendingUp className="mr-1 sm:mr-2" /> Leaderboard
             </button>
             <button
               onClick={() => setActiveTab("challenges")}
-              className={`px-6 py-3 font-medium text-lg flex items-center ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-lg flex items-center whitespace-nowrap ${
                 activeTab === "challenges"
                   ? "text-emerald-600 border-b-2 border-emerald-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <FiAward className="mr-2" /> Challenges
+              <FiAward className="mr-1 sm:mr-2" /> Challenges
             </button>
             <button
               onClick={() => setActiveTab("discussions")}
-              className={`px-6 py-3 font-medium text-lg flex items-center ${
+              className={`px-4 sm:px-6 py-3 font-medium text-sm sm:text-lg flex items-center whitespace-nowrap ${
                 activeTab === "discussions"
                   ? "text-emerald-600 border-b-2 border-emerald-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              <FiUsers className="mr-2" /> Discussions
+              <FiUsers className="mr-1 sm:mr-2" /> Discussions
             </button>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-8 sm:py-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
           {/* Leaderboard Tab */}
           {activeTab === "leaderboard" && (
             <motion.div
@@ -349,19 +349,19 @@ const Community = () => {
               transition={{ duration: 0.5 }}
             >
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold flex items-center">
+                <div className="p-4 sm:p-6 border-b border-gray-200">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center">
                     <FiTrendingUp className="text-emerald-600 mr-2" /> Global Leaderboard
                   </h2>
-                  <p className="text-gray-600 mt-1">
-                    Top eco-champions making the biggest impact this month
+                  <p className="text-gray-600 mt-1 text-sm sm:text-base">
+                    <span className="block sm:inline">Top eco-champions making the biggest impact this month</span>
                     {isAuthenticated && userRank && (
-                      <span className="text-blue-600 font-medium ml-2">
+                      <span className="text-blue-600 font-medium block sm:inline sm:ml-2">
                         • Your rank: #{userRank.rank} (🔥 {userRank.weeklyStreak} day weekly streak)
                       </span>
                     )}
                     {isAuthenticated && !userRank && userDashboardData && userDashboardData.ecoStats?.weeklyStreakDays > 0 && (
-                      <span className="text-emerald-600 font-medium ml-2">
+                      <span className="text-emerald-600 font-medium block sm:inline sm:ml-2">
                         • Current weekly streak: 🔥 {userDashboardData.ecoStats.weeklyStreakDays} days
                       </span>
                     )}
@@ -381,11 +381,11 @@ const Community = () => {
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className={`p-4 flex items-center ${
+                          className={`p-3 sm:p-4 flex items-center ${
                             index < 3 ? "bg-gradient-to-r from-emerald-50 to-teal-50" : ""
                           } ${user.isCurrentUser ? "bg-gradient-to-r from-blue-50 to-emerald-50 border-l-4 border-blue-500" : ""}`}
                         >
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mr-3 sm:mr-4 ${
                             index === 0 ? "bg-yellow-100 text-yellow-600" :
                             index === 1 ? "bg-gray-200 text-gray-600" :
                             index === 2 ? "bg-orange-100 text-orange-600" :
@@ -393,32 +393,34 @@ const Community = () => {
                             "bg-gray-100 text-gray-500"
                           }`}>
                             {index <= 2 ? (
-                              ["🥇", "🥈", "🥉"][index]
+                              <span className="text-sm sm:text-base">{["🥇", "🥈", "🥉"][index]}</span>
                             ) : (
-                              user.rank
+                              <span className="text-xs sm:text-sm font-medium">{user.rank}</span>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center">
-                              <span className="text-2xl mr-3">{user.avatar}</span>
-                              <div>
-                                <h3 className={`font-medium ${user.isCurrentUser ? "text-blue-700" : ""}`}>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center">
+                              <span className="text-lg sm:text-2xl mr-2 sm:mr-3">{user.avatar}</span>
+                              <div className="flex-1 min-w-0">
+                                <h3 className={`font-medium text-sm sm:text-base truncate ${user.isCurrentUser ? "text-blue-700" : ""}`}>
                                   {user.name} {user.isCurrentUser ? "(You)" : ""}
                                 </h3>
-                                <div className="flex items-center text-sm text-gray-500">
-                                  <FiAward className="mr-1" /> {user.points} EcoPoints
-                                  <span className="mx-2">•</span>
+                                <div className="flex flex-col sm:flex-row sm:items-center text-xs sm:text-sm text-gray-500 space-y-1 sm:space-y-0">
+                                  <div className="flex items-center">
+                                    <FiAward className="mr-1" /> {user.points} EcoPoints
+                                  </div>
+                                  <span className="hidden sm:inline mx-2">•</span>
                                   <span className="flex items-center">
                                     🔥 {user.weeklyStreak || 0} day weekly streak
                                   </span>
                                   {user.isCurrentUser && !isLoading && (
-                                    <span className="ml-2 text-blue-600 font-medium">• Live</span>
+                                    <span className="text-blue-600 font-medium sm:ml-2">• Live</span>
                                   )}
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div className="w-24">
+                          <div className="w-16 sm:w-24 ml-2">
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div 
                                 className={`h-full ${
