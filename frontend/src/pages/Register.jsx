@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowLeft } from "react-icons/fi";
 import axios from "../utils/api";
 
 export default function RegisterPage() {
@@ -90,7 +90,16 @@ export default function RegisterPage() {
         className="w-full max-w-md bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/50 shadow-xl"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-center">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-center relative">
+          {/* Back to Home Button */}
+          <Link
+            to="/"
+            className="absolute top-4 left-4 text-white/80 hover:text-white transition-colors flex items-center group"
+          >
+            <FiArrowLeft className="mr-1 group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm">Home</span>
+          </Link>
+          
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-20 h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
