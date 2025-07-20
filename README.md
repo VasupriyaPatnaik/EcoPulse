@@ -226,21 +226,33 @@ npm run eject      # Eject from Create React App
 
 ## 🚀 Deployment
 
-### Option 1: Render (Recommended)
+### Option 1: Netlify + Render (Current Setup)
 
-**Backend Deployment:**
+**Backend Deployment (Render):**
 1. Connect your GitHub repository to Render
 2. Create a new Web Service
 3. Set root directory to `backend`
 4. Build command: `npm install`
 5. Start command: `npm start`
-6. Add environment variables in Render dashboard
+6. Add environment variables in Render dashboard:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `EMAIL_USER`
+   - `EMAIL_PASS`
+   - `NODE_ENV=production`
 
-**Frontend Deployment:**
-1. Create a new Static Site on Render
-2. Set root directory to `frontend`
-3. Build command: `npm run build`
-4. Publish directory: `build`
+**Frontend Deployment (Netlify):**
+1. Connect your GitHub repository to Netlify
+2. Set build settings:
+   - Base directory: `frontend`
+   - Build command: `npm run build`
+   - Publish directory: `frontend/build`
+3. Add environment variables in Netlify dashboard
+4. Configure `_redirects` file for SPA routing
+
+**Live URLs:**
+- 🌐 Frontend: https://ecopulsetrackr.netlify.app/
+- 🔗 Backend API: https://ecopulse-backend-lrsh.onrender.com/
 
 ### Option 2: Docker Deployment
 
