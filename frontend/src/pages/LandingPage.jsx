@@ -539,9 +539,9 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
-        {/* 3D Animated Mascot with fallback */}
-        <div className="absolute right-5 lg:right-10 top-1/2 -translate-y-1/2 w-full max-w-xl h-[400px] lg:h-[600px]">
+      <section className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 text-center">
+        {/* 3D Animated Mascot with fallback - Better mobile positioning */}
+        <div className="absolute right-2 sm:right-5 lg:right-10 top-1/2 -translate-y-1/2 w-full max-w-xs sm:max-w-md lg:max-w-xl h-[250px] sm:h-[350px] lg:h-[600px] opacity-70 sm:opacity-100">
           {!splineError ? (
             <>
               <canvas
@@ -552,8 +552,8 @@ export default function LandingPage() {
                 style={{ transition: "opacity 0.5s ease-out" }}
               />
               {!splineLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-800/50">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800/50 rounded-lg">
+                  <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2 border-emerald-500"></div>
                 </div>
               )}
             </>
@@ -571,10 +571,10 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="relative z-20 max-w-3xl mx-auto"
+          className="relative z-20 max-w-4xl mx-auto"
         >
           <motion.h1
-            className="text-5xl sm:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 to-teal-500"
+            className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 to-teal-500"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 1 }}
@@ -584,7 +584,7 @@ export default function LandingPage() {
           </motion.h1>
 
           <motion.p
-            className="text-xl sm:text-2xl max-w-2xl mx-auto mb-8 leading-relaxed text-emerald-100"
+            className="text-lg sm:text-xl lg:text-2xl max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed text-emerald-100 px-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 1 }}
@@ -599,7 +599,7 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 1 }}
@@ -612,26 +612,26 @@ export default function LandingPage() {
                   navigate("/login");
                 }
               }}
-              className="relative px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-emerald-400/30 transition-all duration-300 overflow-hidden group"
+              className="relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base rounded-full font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-emerald-400/30 transition-all duration-300 overflow-hidden group"
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.5)",
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Get Started <span className="text-xl">🚀</span>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                Get Started <span className="text-lg sm:text-xl">🚀</span>
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             </motion.button>
 
             <motion.button
               onClick={() => setShowChatbot(true)}
-              className="px-8 py-4 rounded-full font-bold text-white border-2 border-emerald-400 bg-black/20 hover:bg-emerald-900/50 backdrop-blur-sm transition-colors duration-300 flex items-center gap-2"
+              className="px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base rounded-full font-bold text-white border-2 border-emerald-400 bg-black/20 hover:bg-emerald-900/50 backdrop-blur-sm transition-colors duration-300 flex items-center justify-center gap-2"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
             >
-              Ask EcoBot <span className="text-xl">🤖</span>
+              Ask EcoBot <span className="text-lg sm:text-xl">🤖</span>
             </motion.button>
           </motion.div>
         </motion.div>
@@ -744,7 +744,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setShowChatbot(true)}
-            className="fixed bottom-8 right-8 z-50 w-16 h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform duration-200 border-2 border-emerald-400/30"
+            className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-full shadow-2xl flex items-center justify-center text-white text-xl sm:text-2xl hover:scale-110 transition-transform duration-200 border-2 border-emerald-400/30"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
@@ -760,11 +760,11 @@ export default function LandingPage() {
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            className="fixed bottom-8 right-8 z-50 w-96 bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-emerald-400/30"
+            className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 w-[calc(100vw-2rem)] max-w-sm sm:w-96 bg-gray-800 rounded-xl shadow-2xl overflow-hidden border border-emerald-400/30"
           >
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white font-bold flex justify-between items-center">
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-3 sm:p-4 text-white font-bold flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🤖</span>
+                <span className="text-lg sm:text-xl">🤖</span>
                 <div>
                   <span className="block text-sm">EcoBot Assistant</span>
                   <span className="block text-xs text-emerald-200">Online • Ready to help</span>
@@ -772,13 +772,13 @@ export default function LandingPage() {
               </div>
               <button
                 onClick={() => setShowChatbot(false)}
-                className="text-white hover:text-gray-200 text-xl"
+                className="text-white hover:text-gray-200 text-lg sm:text-xl"
               >
                 ✕
               </button>
             </div>
             
-            <div className="p-4 h-80 overflow-y-auto bg-gray-900 space-y-3" ref={chatMessagesRef}>
+            <div className="p-3 sm:p-4 h-64 sm:h-80 overflow-y-auto bg-gray-900 space-y-3" ref={chatMessagesRef}>
               {chatMessages.map((message, index) => (
                 <motion.div
                   key={index}
@@ -788,7 +788,7 @@ export default function LandingPage() {
                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-lg text-sm ${
+                    className={`max-w-[75%] sm:max-w-xs px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm ${
                       message.sender === 'user'
                         ? 'bg-emerald-600 text-white'
                         : 'bg-gray-700 text-gray-200 border border-gray-600'
@@ -816,14 +816,14 @@ export default function LandingPage() {
               )}
             </div>
             
-            <div className="p-4 bg-gray-800 border-t border-gray-700">
+            <div className="p-3 sm:p-4 bg-gray-800 border-t border-gray-700">
               <div className="flex space-x-2">
                 <input
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  placeholder="Ask about recycling, energy, water saving..."
-                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
+                  placeholder="Ask about recycling, energy..."
+                  className="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-xs sm:text-sm"
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       handleChatSubmit();
@@ -833,22 +833,22 @@ export default function LandingPage() {
                 <button
                   onClick={handleChatSubmit}
                   disabled={!userInput.trim() || isTyping}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-medium"
+                  className="px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-xs sm:text-sm font-medium"
                 >
                   Send
                 </button>
               </div>
               
-              <div className="mt-3 flex flex-wrap gap-2">
-                {['💡 Energy tips', '♻️ Recycling', '💧 Water saving', '🌱 Random tip'].map((suggestion, index) => (
+              <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
+                {['💡 Energy', '♻️ Recycle', '💧 Water', '🌱 Random'].map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => {
                       const topicMap = {
-                        '💡 Energy tips': 'energy',
-                        '♻️ Recycling': 'recycling',
-                        '💧 Water saving': 'water',
-                        '🌱 Random tip': 'tip'
+                        '💡 Energy': 'energy',
+                        '♻️ Recycle': 'recycling',
+                        '💧 Water': 'water',
+                        '🌱 Random': 'tip'
                       };
                       setUserInput(topicMap[suggestion]);
                       setTimeout(() => handleChatSubmit(), 100);
