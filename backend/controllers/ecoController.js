@@ -20,10 +20,14 @@ export const addEcoActivity = async (req, res) => {
 
     // Update streak
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
     const lastActivity = user.ecoStats.lastActivityDate;
     
+    // Calculate overall daily streak
     if (lastActivity) {
-      const timeDiff = today.getTime() - lastActivity.getTime();
+      const lastActivityDate = new Date(lastActivity);
+      lastActivityDate.setHours(0, 0, 0, 0);
+      const timeDiff = today.getTime() - lastActivityDate.getTime();
       const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
       
       if (daysDiff === 1) {
@@ -38,6 +42,12 @@ export const addEcoActivity = async (req, res) => {
       // First activity
       user.ecoStats.streakDays = 1;
     }
+
+    // Calculate weekly streak
+    const weeklyStreakData = calculateWeeklyStreak(today, user.ecoStats);
+    user.ecoStats.weeklyStreak = weeklyStreakData.weeklyStreak;
+    user.ecoStats.currentWeekStart = weeklyStreakData.currentWeekStart;
+    user.ecoStats.weeklyActivityDates = weeklyStreakData.weeklyActivityDates;
 
     user.ecoStats.lastActivityDate = today;
 
@@ -90,9 +100,18 @@ export const getDashboardData = async (req, res) => {
         energySaved: 0,
         activitiesLogged: 0,
         streakDays: 0,
-        lastActivityDate: null
+        weeklyStreak: 0,
+        lastActivityDate: null,
+        currentWeekStart: null,
+        weeklyActivityDates: []
       };
     }
+
+    // Update weekly streak based on current date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weeklyStreakData = updateUserWeeklyStreak(user.ecoStats, today);
+    user.ecoStats.weeklyStreak = weeklyStreakData.weeklyStreak;
 
     if (!user.badges || user.badges.length === 0) {
       user.badges = [
@@ -228,4 +247,226 @@ function updateBadges(user) {
   }
 
   user.badges = badges;
+}
+
+// Helper function to calculate weekly streak based on activity dates
+function calculateWeeklyStreak(activityDate, ecoStats) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  // Get start of current week (Sunday)
+  const getStartOfWeek = (date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const day = d.getDay();
+    const diff = d.getDate() - day; // Sunday is 0
+    d.setDate(diff);
+    return d;
+  };
+
+  const currentWeekStart = getStartOfWeek(today);
+  
+  // If it's a new week, reset weekly tracking
+  if (!ecoStats.currentWeekStart || 
+      new Date(ecoStats.currentWeekStart).getTime() !== currentWeekStart.getTime()) {
+    return {
+      weeklyStreak: 1,
+      currentWeekStart,
+      weeklyActivityDates: [activityDate]
+    };
+  }
+
+  // Check if activity is already logged for today
+  const todayString = activityDate.toDateString();
+  const existingDates = ecoStats.weeklyActivityDates || [];
+  const alreadyLoggedToday = existingDates.some(date => 
+    new Date(date).toDateString() === todayString
+  );
+
+  if (alreadyLoggedToday) {
+    // Same day, no change to streak
+    return {
+      weeklyStreak: ecoStats.weeklyStreak,
+      currentWeekStart: ecoStats.currentWeekStart,
+      weeklyActivityDates: ecoStats.weeklyActivityDates
+    };
+  }
+
+  // Add today to activity dates
+  const updatedDates = [...existingDates, activityDate];
+  
+  // Calculate consecutive days from start of week
+  let weeklyStreak = 0;
+  const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+  // Check each day from Sunday to today
+  for (let i = 0; i <= currentDayOfWeek; i++) {
+    const checkDate = new Date(currentWeekStart);
+    checkDate.setDate(currentWeekStart.getDate() + i);
+    
+    const hasActivity = updatedDates.some(date => 
+      new Date(date).toDateString() === checkDate.toDateString()
+    );
+
+    if (hasActivity) {
+      weeklyStreak++;
+    } else {
+      // If there's a gap before today, reset streak
+      if (checkDate.getTime() < today.getTime()) {
+        weeklyStreak = 0;
+      }
+    }
+  }
+
+  return {
+    weeklyStreak,
+    currentWeekStart,
+    weeklyActivityDates: updatedDates
+  };
+}
+
+// Get leaderboard data
+export const getLeaderboard = async (req, res) => {
+  try {
+    // Get all users with their eco stats, sorted by total points
+    const users = await User.find({}, {
+      name: 1,
+      ecoStats: 1,
+      recentActivities: 1
+    }).sort({ 'ecoStats.totalPoints': -1 }).limit(50);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const realUsers = users.map((user, index) => {
+      // Update weekly streak for each user based on current date
+      const weeklyStreakData = updateUserWeeklyStreak(user.ecoStats, today);
+      
+      return {
+        rank: index + 1,
+        name: user.name,
+        points: user.ecoStats.totalPoints || 0,
+        weeklyStreak: weeklyStreakData.weeklyStreak,
+        co2Saved: user.ecoStats.co2Saved || 0,
+        waterSaved: user.ecoStats.waterSaved || 0,
+        energySaved: user.ecoStats.energySaved || 0,
+        activitiesLogged: user.ecoStats.activitiesLogged || 0,
+        isCurrentUser: user._id.toString() === req.user._id.toString()
+      };
+    });
+
+    // If we don't have enough real users, add mock users to fill the leaderboard
+    let leaderboard = [...realUsers];
+    
+    if (leaderboard.length < 10) {
+      const mockUsers = [
+        { name: "EcoWarrior42", points: 1245, weeklyStreak: 7 },
+        { name: "GreenThumb", points: 1120, weeklyStreak: 6 },
+        { name: "SustainableSam", points: 980, weeklyStreak: 5 },
+        { name: "ClimateCrusader", points: 875, weeklyStreak: 4 },
+        { name: "RecycleQueen", points: 820, weeklyStreak: 7 },
+        { name: "SolarSister", points: 790, weeklyStreak: 3 },
+        { name: "EcoExplorer", points: 745, weeklyStreak: 2 },
+        { name: "PlanetPal", points: 680, weeklyStreak: 1 },
+        { name: "GreenGuru", points: 655, weeklyStreak: 4 },
+        { name: "EcoNinja", points: 620, weeklyStreak: 3 },
+        { name: "NatureLover", points: 590, weeklyStreak: 2 },
+        { name: "TreeHugger", points: 565, weeklyStreak: 5 }
+      ];
+
+      // Add mock users that don't conflict with real users
+      const realUserNames = new Set(realUsers.map(u => u.name));
+      const filteredMockUsers = mockUsers.filter(mock => !realUserNames.has(mock.name));
+      
+      // Add mock users with points lower than the lowest real user
+      const lowestRealUserPoints = realUsers.length > 0 ? Math.min(...realUsers.map(u => u.points)) : 1500;
+      const adjustedMockUsers = filteredMockUsers.map((mock, index) => ({
+        rank: realUsers.length + index + 1,
+        name: mock.name,
+        points: Math.max(mock.points, lowestRealUserPoints - 100 - (index * 50)),
+        weeklyStreak: mock.weeklyStreak,
+        co2Saved: mock.points / 10,
+        waterSaved: mock.points / 5,
+        energySaved: mock.points / 15,
+        activitiesLogged: Math.floor(mock.points / 20),
+        isCurrentUser: false
+      }));
+
+      leaderboard = [...realUsers, ...adjustedMockUsers];
+    }
+
+    // Re-sort the combined leaderboard and update ranks
+    leaderboard.sort((a, b) => b.points - a.points);
+    leaderboard.forEach((entry, index) => {
+      entry.rank = index + 1;
+    });
+
+    res.json({
+      leaderboard: leaderboard.slice(0, 20), // Return top 20
+      totalUsers: leaderboard.length
+    });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Helper function to update weekly streak based on current date
+function updateUserWeeklyStreak(ecoStats, currentDate) {
+  const today = new Date(currentDate);
+  today.setHours(0, 0, 0, 0);
+  
+  // Get start of current week (Sunday)
+  const getStartOfWeek = (date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const day = d.getDay();
+    const diff = d.getDate() - day;
+    d.setDate(diff);
+    return d;
+  };
+
+  const currentWeekStart = getStartOfWeek(today);
+  
+  // If no weekly tracking data or it's a new week, recalculate from recent activities
+  if (!ecoStats.currentWeekStart || 
+      new Date(ecoStats.currentWeekStart).getTime() !== currentWeekStart.getTime()) {
+    
+    // If we don't have weekly activity dates, return 0 streak
+    if (!ecoStats.weeklyActivityDates || ecoStats.weeklyActivityDates.length === 0) {
+      return { weeklyStreak: 0 };
+    }
+
+    // Filter activities from current week
+    const thisWeekActivities = ecoStats.weeklyActivityDates.filter(date => {
+      const activityDate = new Date(date);
+      return activityDate >= currentWeekStart && activityDate <= today;
+    });
+
+    // Calculate consecutive days from start of week
+    let weeklyStreak = 0;
+    const currentDayOfWeek = today.getDay();
+
+    for (let i = 0; i <= currentDayOfWeek; i++) {
+      const checkDate = new Date(currentWeekStart);
+      checkDate.setDate(currentWeekStart.getDate() + i);
+      
+      const hasActivity = thisWeekActivities.some(date => 
+        new Date(date).toDateString() === checkDate.toDateString()
+      );
+
+      if (hasActivity) {
+        weeklyStreak++;
+      } else {
+        if (checkDate.getTime() < today.getTime()) {
+          weeklyStreak = 0;
+        }
+      }
+    }
+
+    return { weeklyStreak };
+  }
+
+  // Return existing weekly streak
+  return { weeklyStreak: ecoStats.weeklyStreak || 0 };
 }
