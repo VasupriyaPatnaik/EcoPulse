@@ -338,6 +338,10 @@ export const getLeaderboard = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Determine if this is an authenticated request
+    const isAuthenticated = req.user != null;
+    const currentUserId = isAuthenticated ? req.user._id.toString() : null;
+
     const realUsers = users.map((user, index) => {
       // Update weekly streak for each user based on current date
       const weeklyStreakData = updateUserWeeklyStreak(user.ecoStats, today);
@@ -351,51 +355,47 @@ export const getLeaderboard = async (req, res) => {
         waterSaved: user.ecoStats.waterSaved || 0,
         energySaved: user.ecoStats.energySaved || 0,
         activitiesLogged: user.ecoStats.activitiesLogged || 0,
-        isCurrentUser: user._id.toString() === req.user._id.toString()
+        isCurrentUser: isAuthenticated && user._id.toString() === currentUserId
       };
     });
 
-    // If we don't have enough real users, add mock users to fill the leaderboard
-    let leaderboard = [...realUsers];
+    // Always add consistent mock users to fill the leaderboard
+    const mockUsers = [
+      { name: "EcoWarrior42", points: 1245, weeklyStreak: 7 },
+      { name: "GreenThumb", points: 1120, weeklyStreak: 6 },
+      { name: "SustainableSam", points: 980, weeklyStreak: 5 },
+      { name: "ClimateCrusader", points: 875, weeklyStreak: 4 },
+      { name: "RecycleQueen", points: 820, weeklyStreak: 7 },
+      { name: "SolarSister", points: 790, weeklyStreak: 3 },
+      { name: "EcoExplorer", points: 745, weeklyStreak: 2 },
+      { name: "PlanetPal", points: 680, weeklyStreak: 1 },
+      { name: "GreenGuru", points: 655, weeklyStreak: 4 },
+      { name: "EcoNinja", points: 620, weeklyStreak: 3 },
+      { name: "NatureLover", points: 590, weeklyStreak: 2 },
+      { name: "TreeHugger", points: 565, weeklyStreak: 5 }
+    ];
+
+    // Add mock users that don't conflict with real users
+    const realUserNames = new Set(realUsers.map(u => u.name));
+    const filteredMockUsers = mockUsers.filter(mock => !realUserNames.has(mock.name));
     
-    if (leaderboard.length < 10) {
-      const mockUsers = [
-        { name: "EcoWarrior42", points: 1245, weeklyStreak: 7 },
-        { name: "GreenThumb", points: 1120, weeklyStreak: 6 },
-        { name: "SustainableSam", points: 980, weeklyStreak: 5 },
-        { name: "ClimateCrusader", points: 875, weeklyStreak: 4 },
-        { name: "RecycleQueen", points: 820, weeklyStreak: 7 },
-        { name: "SolarSister", points: 790, weeklyStreak: 3 },
-        { name: "EcoExplorer", points: 745, weeklyStreak: 2 },
-        { name: "PlanetPal", points: 680, weeklyStreak: 1 },
-        { name: "GreenGuru", points: 655, weeklyStreak: 4 },
-        { name: "EcoNinja", points: 620, weeklyStreak: 3 },
-        { name: "NatureLover", points: 590, weeklyStreak: 2 },
-        { name: "TreeHugger", points: 565, weeklyStreak: 5 }
-      ];
+    // Ensure mock users have consistent points that don't interfere with real users
+    const adjustedMockUsers = filteredMockUsers.map((mock, index) => ({
+      rank: 0, // Will be recalculated after sorting
+      name: mock.name,
+      points: mock.points,
+      weeklyStreak: mock.weeklyStreak,
+      co2Saved: mock.points / 10,
+      waterSaved: mock.points / 5,
+      energySaved: mock.points / 15,
+      activitiesLogged: Math.floor(mock.points / 20),
+      isCurrentUser: false
+    }));
 
-      // Add mock users that don't conflict with real users
-      const realUserNames = new Set(realUsers.map(u => u.name));
-      const filteredMockUsers = mockUsers.filter(mock => !realUserNames.has(mock.name));
-      
-      // Add mock users with points lower than the lowest real user
-      const lowestRealUserPoints = realUsers.length > 0 ? Math.min(...realUsers.map(u => u.points)) : 1500;
-      const adjustedMockUsers = filteredMockUsers.map((mock, index) => ({
-        rank: realUsers.length + index + 1,
-        name: mock.name,
-        points: Math.max(mock.points, lowestRealUserPoints - 100 - (index * 50)),
-        weeklyStreak: mock.weeklyStreak,
-        co2Saved: mock.points / 10,
-        waterSaved: mock.points / 5,
-        energySaved: mock.points / 15,
-        activitiesLogged: Math.floor(mock.points / 20),
-        isCurrentUser: false
-      }));
+    // Combine real and mock users
+    let leaderboard = [...realUsers, ...adjustedMockUsers];
 
-      leaderboard = [...realUsers, ...adjustedMockUsers];
-    }
-
-    // Re-sort the combined leaderboard and update ranks
+    // Sort the combined leaderboard by points and update ranks
     leaderboard.sort((a, b) => b.points - a.points);
     leaderboard.forEach((entry, index) => {
       entry.rank = index + 1;
@@ -403,7 +403,8 @@ export const getLeaderboard = async (req, res) => {
 
     res.json({
       leaderboard: leaderboard.slice(0, 20), // Return top 20
-      totalUsers: leaderboard.length
+      totalUsers: leaderboard.length,
+      isAuthenticated: isAuthenticated
     });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);

@@ -82,52 +82,41 @@ const Community = () => {
   // Fetch leaderboard data from backend
   const fetchLeaderboard = useCallback(async () => {
     try {
+      let response;
+      
       if (isAuthenticated) {
+        // Authenticated request - shows user's rank
         const token = localStorage.getItem('token');
-        const response = await api.get('/eco/leaderboard', {
+        response = await api.get('/eco/leaderboard', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        
-        console.log('Leaderboard response:', response.data); // Debug log
-        setLeaderboardData(response.data.leaderboard || []);
       } else {
-        // For non-authenticated users, show static leaderboard
-        const staticLeaderboard = [
-          { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, weeklyStreak: 7, isCurrentUser: false },
-          { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, weeklyStreak: 6, isCurrentUser: false },
-          { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, weeklyStreak: 5, isCurrentUser: false },
-          { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, weeklyStreak: 4, isCurrentUser: false },
-          { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, weeklyStreak: 7, isCurrentUser: false },
-          { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, weeklyStreak: 3, isCurrentUser: false },
-          { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, weeklyStreak: 2, isCurrentUser: false },
-          { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, weeklyStreak: 1, isCurrentUser: false },
-          { rank: 9, name: "GreenGuru", points: 655, avatar: "🌿", progress: 48, weeklyStreak: 4, isCurrentUser: false },
-          { rank: 10, name: "EcoNinja", points: 620, avatar: "💚", progress: 45, weeklyStreak: 3, isCurrentUser: false },
-          { rank: 11, name: "NatureLover", points: 590, avatar: "🍃", progress: 42, weeklyStreak: 2, isCurrentUser: false },
-          { rank: 12, name: "TreeHugger", points: 565, avatar: "🌳", progress: 40, weeklyStreak: 5, isCurrentUser: false }
-        ];
-        setLeaderboardData(staticLeaderboard);
+        // Public request - same data but no user rank highlighting
+        response = await api.get('/eco/leaderboard/public');
       }
+      
+      console.log('Leaderboard response:', response.data); // Debug log
+      setLeaderboardData(response.data.leaderboard || []);
+      
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
-      // Fallback to static data if API fails
-      const staticLeaderboard = [
-        { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, weeklyStreak: 7, isCurrentUser: false },
-        { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, weeklyStreak: 6, isCurrentUser: false },
-        { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, weeklyStreak: 5, isCurrentUser: false },
-        { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, weeklyStreak: 4, isCurrentUser: false },
-        { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, weeklyStreak: 7, isCurrentUser: false },
-        { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, weeklyStreak: 3, isCurrentUser: false },
-        { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, weeklyStreak: 2, isCurrentUser: false },
-        { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, weeklyStreak: 1, isCurrentUser: false },
-        { rank: 9, name: "GreenGuru", points: 655, avatar: "🌿", progress: 48, weeklyStreak: 4, isCurrentUser: false },
-        { rank: 10, name: "EcoNinja", points: 620, avatar: "💚", progress: 45, weeklyStreak: 3, isCurrentUser: false },
-        { rank: 11, name: "NatureLover", points: 590, avatar: "🍃", progress: 42, weeklyStreak: 2, isCurrentUser: false },
-        { rank: 12, name: "TreeHugger", points: 565, avatar: "🌳", progress: 40, weeklyStreak: 5, isCurrentUser: false }
+      
+      // Fallback to static data only if API completely fails
+      const fallbackLeaderboard = [
+        { rank: 1, name: "EcoWarrior42", points: 1245, weeklyStreak: 7, isCurrentUser: false },
+        { rank: 2, name: "GreenThumb", points: 1120, weeklyStreak: 6, isCurrentUser: false },
+        { rank: 3, name: "SustainableSam", points: 980, weeklyStreak: 5, isCurrentUser: false },
+        { rank: 4, name: "ClimateCrusader", points: 875, weeklyStreak: 4, isCurrentUser: false },
+        { rank: 5, name: "RecycleQueen", points: 820, weeklyStreak: 7, isCurrentUser: false },
+        { rank: 6, name: "SolarSister", points: 790, weeklyStreak: 3, isCurrentUser: false },
+        { rank: 7, name: "EcoExplorer", points: 745, weeklyStreak: 2, isCurrentUser: false },
+        { rank: 8, name: "PlanetPal", points: 680, weeklyStreak: 1, isCurrentUser: false },
+        { rank: 9, name: "GreenGuru", points: 655, weeklyStreak: 4, isCurrentUser: false },
+        { rank: 10, name: "EcoNinja", points: 620, weeklyStreak: 3, isCurrentUser: false }
       ];
-      setLeaderboardData(staticLeaderboard);
+      setLeaderboardData(fallbackLeaderboard);
     } finally {
       setLeaderboardLoading(false);
     }
