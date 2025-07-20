@@ -9,7 +9,9 @@ const Community = () => {
   const [activeTab, setActiveTab] = useState("leaderboard");
   const [joinedChallenges, setJoinedChallenges] = useState(["Plastic-Free Week"]);
   const [userDashboardData, setUserDashboardData] = useState(null);
+  const [leaderboardData, setLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
 
   // Weekly streak calculation utility functions (same as Dashboard)
   const getStartOfWeek = useCallback((date = new Date()) => {
@@ -77,102 +79,90 @@ const Community = () => {
     };
   }, [getStartOfWeek, getDayOfWeek]);
 
-  // Leaderboard data with dynamic user integration
+  // Fetch leaderboard data from backend
+  const fetchLeaderboard = useCallback(async () => {
+    if (!isAuthenticated) {
+      setLeaderboardLoading(false);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await api.get('/eco/leaderboard', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      setLeaderboardData(response.data.leaderboard || []);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      // Fallback to static data if API fails
+      const staticLeaderboard = [
+        { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, weeklyStreak: 7, isCurrentUser: false },
+        { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, weeklyStreak: 6, isCurrentUser: false },
+        { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, weeklyStreak: 5, isCurrentUser: false },
+        { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, weeklyStreak: 4, isCurrentUser: false },
+        { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, weeklyStreak: 7, isCurrentUser: false },
+        { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, weeklyStreak: 3, isCurrentUser: false },
+        { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, weeklyStreak: 2, isCurrentUser: false },
+        { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, weeklyStreak: 1, isCurrentUser: false },
+        { rank: 9, name: "GreenGuru", points: 655, avatar: "🌿", progress: 48, weeklyStreak: 4, isCurrentUser: false },
+        { rank: 10, name: "EcoNinja", points: 620, avatar: "💚", progress: 45, weeklyStreak: 3, isCurrentUser: false },
+        { rank: 11, name: "NatureLover", points: 590, avatar: "🍃", progress: 42, weeklyStreak: 2, isCurrentUser: false },
+        { rank: 12, name: "TreeHugger", points: 565, avatar: "🌳", progress: 40, weeklyStreak: 5, isCurrentUser: false }
+      ];
+      setLeaderboardData(staticLeaderboard);
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  // Get leaderboard data (now using real data from backend)
   const getLeaderboardWithUser = () => {
-    const staticLeaderboard = [
-      { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, streak: 7, isUser: false },
-      { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, streak: 6, isUser: false },
-      { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, streak: 5, isUser: false },
-      { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, streak: 4, isUser: false },
-      { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, streak: 7, isUser: false },
-      { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, streak: 3, isUser: false },
-      { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, streak: 2, isUser: false },
-      { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, streak: 1, isUser: false },
-    ];
-
-    if (!isAuthenticated || !userDashboardData) {
-      return staticLeaderboard;
+    if (!leaderboardData.length) {
+      return [];
     }
 
-    // Calculate weekly streak from user's activities
-    const streakData = calculateWeeklyStreak(userDashboardData.recentActivities || []);
-    const userWeeklyStreak = streakData.streakDays;
+    // Add avatars and progress calculations to real data
+    return leaderboardData.map(entry => ({
+      ...entry,
+      avatar: entry.isCurrentUser ? "👋" : getRandomAvatar(entry.rank),
+      progress: leaderboardData.length > 0 ? 
+        Math.min((entry.points / Math.max(leaderboardData[0]?.points || 1, 1)) * 100, 100) : 0
+    }));
+  };
 
-    // Add current user to leaderboard
-    const userPoints = userDashboardData.ecoStats.totalPoints;
-    
-    // Don't add user to main leaderboard if they have 0 points
-    if (userPoints === 0) {
-      return staticLeaderboard;
-    }
-
-    const userEntry = {
-      rank: 0, // Will be calculated
-      name: user?.name || 'You',
-      points: userPoints,
-      avatar: "👋",
-      progress: Math.min((userPoints / 1245) * 100, 100), // Progress relative to top user
-      streak: userWeeklyStreak,
-      isUser: true
-    };
-
-    // Combine and sort by points
-    const combinedLeaderboard = [...staticLeaderboard, userEntry].sort((a, b) => b.points - a.points);
-    
-    // Update ranks
-    combinedLeaderboard.forEach((entry, index) => {
-      entry.rank = index + 1;
-    });
-
-    return combinedLeaderboard;
+  // Helper function to get random avatar for users
+  const getRandomAvatar = (rank) => {
+    const avatars = ["🌍", "🌱", "♻️", "🔥", "🔄", "☀️", "🧭", "🌎", "🌿", "💚", "🍃", "🌳", "🌺", "🦋", "🌊"];
+    return avatars[(rank - 1) % avatars.length];
   };
 
   const leaderboard = getLeaderboardWithUser();
-  const userRank = leaderboard.find(entry => entry.isUser);
+  const userRank = leaderboard.find(entry => entry.isCurrentUser);
   
-  // Calculate user's actual rank even if not in main leaderboard
-  const getUserActualRank = () => {
-    if (!userDashboardData) return null;
-    
-    // Calculate weekly streak from user's activities
-    const streakData = calculateWeeklyStreak(userDashboardData.recentActivities || []);
-    const userWeeklyStreak = streakData.streakDays;
-    
-    const userPoints = userDashboardData.ecoStats.totalPoints;
-    if (userPoints === 0) return null;
-    
-    // Count how many users have more points
-    const staticLeaderboard = [1245, 1120, 980, 875, 820, 790, 745, 680];
-    const betterUsers = staticLeaderboard.filter(points => points > userPoints).length;
-    
-    return {
-      rank: betterUsers + 1,
-      points: userPoints,
-      streak: userWeeklyStreak,
-      progress: Math.min((userPoints / 1245) * 100, 100)
-    };
-  };
-
-  const userActualRank = getUserActualRank();
-
-  // Fetch user dashboard data for dynamic ranking
+  // Fetch user dashboard data and leaderboard
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       if (!isAuthenticated) {
         setIsLoading(false);
+        setLeaderboardLoading(false);
         return;
       }
 
       try {
         const token = localStorage.getItem('token');
-        const response = await api.get('/eco/dashboard', {
+        
+        // Fetch dashboard data
+        const dashboardResponse = await api.get('/eco/dashboard', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
         
         // Get the full data and calculate weekly streak
-        const responseData = response.data;
+        const responseData = dashboardResponse.data;
         const streakData = calculateWeeklyStreak(responseData.recentActivities || []);
         
         // Update the data with calculated weekly streak
@@ -193,8 +183,9 @@ const Community = () => {
       }
     };
 
-    fetchUserData();
-  }, [isAuthenticated, calculateWeeklyStreak]);
+    fetchData();
+    fetchLeaderboard();
+  }, [isAuthenticated, calculateWeeklyStreak, fetchLeaderboard]);
 
   // Challenges data
   const challenges = [
@@ -355,25 +346,20 @@ const Community = () => {
                     Top eco-champions making the biggest impact this month
                     {isAuthenticated && userRank && (
                       <span className="text-blue-600 font-medium ml-2">
-                        • Your rank: #{userRank.rank} (🔥 {userRank.streak} day streak)
+                        • Your rank: #{userRank.rank} (🔥 {userRank.weeklyStreak} day weekly streak)
                       </span>
                     )}
-                    {isAuthenticated && !userRank && userActualRank && (
-                      <span className="text-blue-600 font-medium ml-2">
-                        • Your rank: #{userActualRank.rank} (🔥 {userActualRank.streak} day streak)
-                      </span>
-                    )}
-                    {isAuthenticated && !userRank && !userActualRank && userDashboardData && calculateWeeklyStreak(userDashboardData.recentActivities || []).streakDays > 0 && (
+                    {isAuthenticated && !userRank && userDashboardData && userDashboardData.ecoStats?.weeklyStreakDays > 0 && (
                       <span className="text-emerald-600 font-medium ml-2">
-                        • Current weekly streak: 🔥 {calculateWeeklyStreak(userDashboardData.recentActivities || []).streakDays} days
+                        • Current weekly streak: 🔥 {userDashboardData.ecoStats.weeklyStreakDays} days
                       </span>
                     )}
                   </p>
                 </div>
-                  {isLoading && isAuthenticated ? (
+                  {(isLoading || leaderboardLoading) && isAuthenticated ? (
                   <div className="p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading your position...</p>
+                    <p className="text-gray-600">{isLoading ? "Loading your position..." : "Loading leaderboard..."}</p>
                   </div>
                 ) : (
                   <>
@@ -412,7 +398,7 @@ const Community = () => {
                                   <FiAward className="mr-1" /> {user.points} EcoPoints
                                   <span className="mx-2">•</span>
                                   <span className="flex items-center">
-                                    🔥 {user.streak} day streak
+                                    🔥 {user.weeklyStreak || 0} day weekly streak
                                   </span>
                                   {user.isUser && !isLoading && (
                                     <span className="ml-2 text-blue-600 font-medium">• Live</span>
@@ -463,17 +449,17 @@ const Community = () => {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
                       <span className="ml-2 text-gray-600">Loading your stats...</span>
                     </div>
-                  ) : userRank || userActualRank ? (
+                  ) : userRank ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <span className="text-2xl mr-4">👋</span>
                         <div>
                           <h4 className="font-medium">{user?.name || 'EcoHero'} (You)</h4>
                           <p className="text-sm text-gray-600">
-                            Rank #{(userRank?.rank || userActualRank?.rank)} with {(userRank?.points || userActualRank?.points)} points
+                            Rank #{userRank.rank} with {userRank.points} points
                           </p>
                           <p className="text-sm text-emerald-600 font-medium">
-                            🔥 {calculateWeeklyStreak(userDashboardData?.recentActivities || []).streakDays} day weekly streak
+                            🔥 {userRank.weeklyStreak || 0} day weekly streak
                           </p>
                           {userDashboardData && (
                             <p className="text-xs text-blue-600 mt-1">
@@ -488,11 +474,11 @@ const Community = () => {
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-emerald-400" 
-                            style={{ width: `${(userRank?.progress || userActualRank?.progress)}%` }}
+                            style={{ width: `${userRank.progress}%` }}
                           ></div>
                         </div>
                         <div className="text-xs text-gray-500 text-right mt-1">
-                          {((userRank?.progress || userActualRank?.progress) || 0).toFixed(0)}% to top
+                          {(userRank.progress || 0).toFixed(0)}% to top
                         </div>
                       </div>
                     </div>
@@ -503,9 +489,9 @@ const Community = () => {
                       <p className="text-gray-600 mb-2">
                         You haven't earned any EcoPoints yet. Start logging activities to climb the leaderboard!
                       </p>
-                      {calculateWeeklyStreak(userDashboardData?.recentActivities || []).streakDays > 0 && (
+                      {userDashboardData.ecoStats?.weeklyStreakDays > 0 && (
                         <p className="text-sm text-emerald-600 font-medium mb-4">
-                          🔥 Current weekly streak: {calculateWeeklyStreak(userDashboardData?.recentActivities || []).streakDays} days - Keep it up!
+                          🔥 Current weekly streak: {userDashboardData.ecoStats.weeklyStreakDays} days - Keep it up!
                         </p>
                       )}
                       <button 
