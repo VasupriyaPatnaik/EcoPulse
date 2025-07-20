@@ -81,20 +81,34 @@ const Community = () => {
 
   // Fetch leaderboard data from backend
   const fetchLeaderboard = useCallback(async () => {
-    if (!isAuthenticated) {
-      setLeaderboardLoading(false);
-      return;
-    }
-
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('/eco/leaderboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      setLeaderboardData(response.data.leaderboard || []);
+      if (isAuthenticated) {
+        const token = localStorage.getItem('token');
+        const response = await api.get('/eco/leaderboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        setLeaderboardData(response.data.leaderboard || []);
+      } else {
+        // For non-authenticated users, show static leaderboard
+        const staticLeaderboard = [
+          { rank: 1, name: "EcoWarrior42", points: 1245, avatar: "🌍", progress: 100, weeklyStreak: 7, isCurrentUser: false },
+          { rank: 2, name: "GreenThumb", points: 1120, avatar: "🌱", progress: 90, weeklyStreak: 6, isCurrentUser: false },
+          { rank: 3, name: "SustainableSam", points: 980, avatar: "♻️", progress: 80, weeklyStreak: 5, isCurrentUser: false },
+          { rank: 4, name: "ClimateCrusader", points: 875, avatar: "🔥", progress: 70, weeklyStreak: 4, isCurrentUser: false },
+          { rank: 5, name: "RecycleQueen", points: 820, avatar: "🔄", progress: 65, weeklyStreak: 7, isCurrentUser: false },
+          { rank: 6, name: "SolarSister", points: 790, avatar: "☀️", progress: 60, weeklyStreak: 3, isCurrentUser: false },
+          { rank: 7, name: "EcoExplorer", points: 745, avatar: "🧭", progress: 55, weeklyStreak: 2, isCurrentUser: false },
+          { rank: 8, name: "PlanetPal", points: 680, avatar: "🌎", progress: 50, weeklyStreak: 1, isCurrentUser: false },
+          { rank: 9, name: "GreenGuru", points: 655, avatar: "🌿", progress: 48, weeklyStreak: 4, isCurrentUser: false },
+          { rank: 10, name: "EcoNinja", points: 620, avatar: "💚", progress: 45, weeklyStreak: 3, isCurrentUser: false },
+          { rank: 11, name: "NatureLover", points: 590, avatar: "🍃", progress: 42, weeklyStreak: 2, isCurrentUser: false },
+          { rank: 12, name: "TreeHugger", points: 565, avatar: "🌳", progress: 40, weeklyStreak: 5, isCurrentUser: false }
+        ];
+        setLeaderboardData(staticLeaderboard);
+      }
     } catch (error) {
       console.error('Error fetching leaderboard:', error);
       // Fallback to static data if API fails
@@ -147,7 +161,6 @@ const Community = () => {
     const fetchData = async () => {
       if (!isAuthenticated) {
         setIsLoading(false);
-        setLeaderboardLoading(false);
         return;
       }
 
@@ -183,8 +196,16 @@ const Community = () => {
       }
     };
 
-    fetchData();
+    // Always fetch leaderboard data regardless of authentication
     fetchLeaderboard();
+    
+    // Only fetch user dashboard data if authenticated
+    if (isAuthenticated) {
+      fetchData();
+    } else {
+      setIsLoading(false);
+      setLeaderboardLoading(false);
+    }
   }, [isAuthenticated, calculateWeeklyStreak, fetchLeaderboard]);
 
   // Challenges data
@@ -356,10 +377,10 @@ const Community = () => {
                     )}
                   </p>
                 </div>
-                  {(isLoading || leaderboardLoading) && isAuthenticated ? (
+                  {leaderboardLoading ? (
                   <div className="p-8 text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">{isLoading ? "Loading your position..." : "Loading leaderboard..."}</p>
+                    <p className="text-gray-600">Loading leaderboard...</p>
                   </div>
                 ) : (
                   <>
@@ -372,13 +393,13 @@ const Community = () => {
                           transition={{ delay: index * 0.05 }}
                           className={`p-4 flex items-center ${
                             index < 3 ? "bg-gradient-to-r from-emerald-50 to-teal-50" : ""
-                          } ${user.isUser ? "bg-gradient-to-r from-blue-50 to-emerald-50 border-l-4 border-blue-500" : ""}`}
+                          } ${user.isCurrentUser ? "bg-gradient-to-r from-blue-50 to-emerald-50 border-l-4 border-blue-500" : ""}`}
                         >
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
                             index === 0 ? "bg-yellow-100 text-yellow-600" :
                             index === 1 ? "bg-gray-200 text-gray-600" :
                             index === 2 ? "bg-orange-100 text-orange-600" :
-                            user.isUser ? "bg-blue-100 text-blue-600" :
+                            user.isCurrentUser ? "bg-blue-100 text-blue-600" :
                             "bg-gray-100 text-gray-500"
                           }`}>
                             {index <= 2 ? (
@@ -391,8 +412,8 @@ const Community = () => {
                             <div className="flex items-center">
                               <span className="text-2xl mr-3">{user.avatar}</span>
                               <div>
-                                <h3 className={`font-medium ${user.isUser ? "text-blue-700" : ""}`}>
-                                  {user.name} {user.isUser ? "(You)" : ""}
+                                <h3 className={`font-medium ${user.isCurrentUser ? "text-blue-700" : ""}`}>
+                                  {user.name} {user.isCurrentUser ? "(You)" : ""}
                                 </h3>
                                 <div className="flex items-center text-sm text-gray-500">
                                   <FiAward className="mr-1" /> {user.points} EcoPoints
@@ -400,7 +421,7 @@ const Community = () => {
                                   <span className="flex items-center">
                                     🔥 {user.weeklyStreak || 0} day weekly streak
                                   </span>
-                                  {user.isUser && !isLoading && (
+                                  {user.isCurrentUser && !isLoading && (
                                     <span className="ml-2 text-blue-600 font-medium">• Live</span>
                                   )}
                                 </div>
@@ -414,7 +435,7 @@ const Community = () => {
                                   index === 0 ? "bg-yellow-400" :
                                   index === 1 ? "bg-gray-400" :
                                   index === 2 ? "bg-orange-400" :
-                                  user.isUser ? "bg-blue-400" :
+                                  user.isCurrentUser ? "bg-blue-400" :
                                   "bg-emerald-400"
                                 }`}
                                 style={{ width: `${user.progress}%` }}
@@ -444,7 +465,7 @@ const Community = () => {
                     <span className="bg-emerald-100 text-emerald-800 w-8 h-8 rounded-full flex items-center justify-center mr-3">🌟</span>
                     Your Position
                   </h3>
-                  {isLoading ? (
+                  {(isLoading && isAuthenticated) ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
                       <span className="ml-2 text-gray-600">Loading your stats...</span>
