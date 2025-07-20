@@ -84,6 +84,7 @@ export default function Dashboard() {
       energySaved: 0,
       activitiesLogged: 0,
       streakDays: 0,
+      weeklyStreakDays: 0,
       lastActivityDate: null,
       weeklyActivityDays: [] // Array of dates when activities were logged this week
     },
@@ -119,16 +120,15 @@ export default function Dashboard() {
         
         const responseData = response.data;
         
-        // Calculate weekly streak from activities
-        const streakData = calculateWeeklyStreak(responseData.recentActivities);
-        
-        // Update dashboard data with calculated streak
+        // Use backend's weekly streak data if available, otherwise calculate on frontend
         const updatedData = {
           ...responseData,
           ecoStats: {
             ...responseData.ecoStats,
-            streakDays: streakData.streakDays,
-            weeklyActivityDays: streakData.weeklyActivityDays,
+            // Use backend weekly streak if available
+            weeklyStreakDays: responseData.ecoStats.weeklyStreak || 
+                             calculateWeeklyStreak(responseData.recentActivities).streakDays,
+            weeklyActivityDays: calculateWeeklyStreak(responseData.recentActivities).weeklyActivityDays,
             lastActivityDate: responseData.recentActivities.length > 0 
               ? responseData.recentActivities[0].timestamp 
               : null
@@ -221,7 +221,7 @@ export default function Dashboard() {
             ...prev,
             ecoStats: {
               ...prev.ecoStats,
-              streakDays: streakData.streakDays,
+              weeklyStreakDays: streakData.streakDays,
               weeklyActivityDays: streakData.weeklyActivityDays
             }
           }));
@@ -402,14 +402,14 @@ export default function Dashboard() {
               <h2 className="text-xl font-bold text-green-700">🔥 Weekly Streak</h2>
             </div>
             <p className="mb-2">
-              You've logged green actions for <strong>{dashboardData.ecoStats.streakDays}</strong> consecutive days!
+              You've logged green actions for <strong>{dashboardData.ecoStats.weeklyStreakDays || 0}</strong> consecutive days this week!
             </p>
             <div className="flex mt-4">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div
                   key={day}
                   className={`w-8 h-8 rounded-full flex items-center justify-center mr-2 ${
-                    day <= dashboardData.ecoStats.streakDays ? "bg-green-500 text-white" : "bg-gray-200"
+                    day <= (dashboardData.ecoStats.weeklyStreakDays || 0) ? "bg-green-500 text-white" : "bg-gray-200"
                   }`}
                 >
                   {day}
