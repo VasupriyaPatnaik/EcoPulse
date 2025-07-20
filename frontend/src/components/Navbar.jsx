@@ -148,99 +148,131 @@ export default function Navbar({ onLoginClick }) {
             </svg>
           </motion.button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden overflow-hidden"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="absolute left-0 top-0 h-full w-80 bg-gray-900/95 backdrop-blur-md border-r border-emerald-500/20"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="pt-4 pb-6 space-y-4">
-                {navItems.map((item) => (
-                  <motion.div
-                    key={item.path}
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
+              <div className="flex flex-col h-full">
+                {/* Mobile Menu Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+                      <span className="text-lg">🌱</span>
+                    </div>
+                    <span className="text-lg font-bold bg-gradient-to-r from-emerald-300 to-teal-400 bg-clip-text text-transparent">
+                      EcoPulse
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-gray-400 hover:text-white p-2"
                   >
-                    <Link
-                      to={item.path}
-                      className="block px-3 py-2 text-gray-300 hover:text-emerald-300 transition-colors font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                ))}
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
 
-                <div className="border-t border-gray-700 pt-4 mt-4">
-                  {isAuthenticated ? (
-                    <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.2 }}
-                      className="space-y-3"
-                    >
-                      <div className="text-center text-emerald-300 font-medium">
-                        Welcome, {user?.name || 'User'}
-                      </div>
-                      <Link
-                        to="/dashboard"
-                        className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
-                        onClick={() => setMobileMenuOpen(false)}
+                {/* Mobile Menu Content */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  <div className="space-y-4">
+                    {navItems.map((item, index) => (
+                      <motion.div
+                        key={item.path}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
                       >
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="block w-full text-center px-6 py-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
-                      >
-                        Logout
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <>
+                        <Link
+                          to={item.path}
+                          className="block px-4 py-3 text-lg text-gray-300 hover:text-emerald-300 hover:bg-emerald-900/20 rounded-lg transition-all"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* Mobile Auth Section */}
+                  <div className="border-t border-gray-700 pt-6 mt-8">
+                    {isAuthenticated ? (
                       <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.3, delay: 0.1 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                        className="space-y-4"
+                      >
+                        <div className="text-center py-4 px-4 bg-emerald-900/20 rounded-lg">
+                          <span className="text-emerald-300 font-medium">
+                            Welcome, {user?.name || 'User'}
+                          </span>
+                        </div>
+                        <Link
+                          to="/dashboard"
+                          className="block w-full text-center px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="block w-full text-center px-6 py-3 rounded-lg border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
+                        >
+                          Logout
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                        className="space-y-3"
                       >
                         <Link
                           to="/login"
-                          className="block w-full text-center px-6 py-3 mb-3 rounded-full border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
+                          className="block w-full text-center px-6 py-3 rounded-lg border border-emerald-400 text-emerald-300 font-medium hover:bg-emerald-900/30 transition-all"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Log In
                         </Link>
-                      </motion.div>
-                      <motion.div
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.3, delay: 0.2 }}
-                      >
                         <Link
                           to="/register"
-                          className="block w-full text-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
+                          className="block w-full text-center px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium shadow-lg hover:shadow-emerald-500/30 transition-all"
                           onClick={() => setMobileMenuOpen(false)}
                         >
                           Sign Up
                         </Link>
                       </motion.div>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
