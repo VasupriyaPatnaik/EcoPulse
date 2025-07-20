@@ -50,6 +50,12 @@
 - Global and friend leaderboards
 - Weekly challenge participation
 
+### 📱 **Mobile Experience**
+- Fully responsive design
+- Touch-optimized interface
+- Mobile-first navigation
+- Seamless cross-device sync
+
 </td>
 <td width="50%">
 
@@ -65,11 +71,11 @@
 - Progress tracking over time
 - Personalized insights
 
-### 📱 **Mobile Experience**
-- Fully responsive design
-- Touch-optimized interface
-- Mobile-first navigation
-- Seamless cross-device sync
+### � **Security & Reliability**
+- JWT authentication system
+- Secure data encryption
+- Privacy-first approach
+- Regular security updates
 
 </td>
 </tr>
