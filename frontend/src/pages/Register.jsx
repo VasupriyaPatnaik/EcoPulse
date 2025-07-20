@@ -57,7 +57,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-teal-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-teal-900 flex items-center justify-center p-3 sm:p-4">
       {/* Animated background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(15)].map((_, i) => (
@@ -65,8 +65,8 @@ export default function RegisterPage() {
             key={i}
             className="absolute rounded-full bg-teal-500/10"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
               width: Math.random() * 15 + 5,
               height: Math.random() * 15 + 5,
             }}
@@ -90,28 +90,28 @@ export default function RegisterPage() {
         className="w-full max-w-md bg-gray-800/80 backdrop-blur-md rounded-2xl overflow-hidden border border-gray-700/50 shadow-xl"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-center relative">
+        <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-4 sm:p-6 text-center relative">
           {/* Back to Home Button */}
           <Link
             to="/"
-            className="absolute top-4 left-4 text-white/80 hover:text-white transition-colors flex items-center group"
+            className="absolute top-3 sm:top-4 left-3 sm:left-4 text-white/80 hover:text-white transition-colors flex items-center group"
           >
-            <FiArrowLeft className="mr-1 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">Home</span>
+            <FiArrowLeft className="mr-1 group-hover:-translate-x-1 transition-transform text-sm sm:text-base" />
+            <span className="text-xs sm:text-sm">Home</span>
           </Link>
           
           <motion.div
             whileHover={{ scale: 1.1 }}
-            className="w-20 h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
+            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center"
           >
-            <span className="text-3xl">🌍</span>
+            <span className="text-2xl sm:text-3xl">🌍</span>
           </motion.div>
-          <h1 className="text-2xl font-bold text-white mt-4">Join EcoPulse</h1>
-          <p className="text-teal-100">Create your sustainable journey</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-white mt-3 sm:mt-4">Join EcoPulse</h1>
+          <p className="text-teal-100 text-sm">Create your sustainable journey</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -127,14 +127,14 @@ export default function RegisterPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <label className="block text-gray-300 mb-2">Full Name</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Full Name</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiUser className="text-gray-500" />
+                <FiUser className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type="text"
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="Your name"
                 value={formData.name}
                 onChange={(e) =>
@@ -150,14 +150,14 @@ export default function RegisterPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <label className="block text-gray-300 mb-2">Email</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Email</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiMail className="text-gray-500" />
+                <FiMail className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type="email"
-                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={(e) =>
@@ -173,14 +173,14 @@ export default function RegisterPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <label className="block text-gray-300 mb-2">Password</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Password</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock className="text-gray-500" />
+                <FiLock className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                className="w-full pl-10 pr-12 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) =>
@@ -190,17 +190,17 @@ export default function RegisterPage() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <FiEye className="text-gray-400 hover:text-emerald-400" />
+                  <FiEye className="text-gray-400 hover:text-emerald-400 text-sm sm:text-base" />
                 ) : (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400 text-sm sm:text-base" />
                 )}
               </button>
             </div>
-            <div className="text-xs text-gray-500 mt-2">
+            <div className="text-xs text-gray-500 mt-1 sm:mt-2">
               Minimum 8 characters with at least one number
             </div>
           </motion.div>
@@ -210,14 +210,14 @@ export default function RegisterPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <label className="block text-gray-300 mb-2">Confirm Password</label>
+            <label className="block text-gray-300 mb-1 sm:mb-2 text-sm sm:text-base">Confirm Password</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiLock className="text-gray-500" />
+                <FiLock className="text-gray-500 text-sm sm:text-base" />
               </div>
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                className="w-full pl-10 pr-12 py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400"
+                className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-700/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400 text-white placeholder-gray-400 text-sm sm:text-base"
                 placeholder="••••••••"
                 value={formData.confirmPassword}
                 onChange={(e) =>
@@ -227,13 +227,13 @@ export default function RegisterPage() {
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? (
-                  <FiEye className="text-gray-400 hover:text-emerald-400" />
+                  <FiEye className="text-gray-400 hover:text-emerald-400 text-sm sm:text-base" />
                 ) : (
-                  <FiEyeOff className="text-gray-400 hover:text-emerald-400" />
+                  <FiEyeOff className="text-gray-400 hover:text-emerald-400 text-sm sm:text-base" />
                 )}
               </button>
             </div>
@@ -248,10 +248,10 @@ export default function RegisterPage() {
             <input
               type="checkbox"
               id="terms"
-              className="w-4 h-4 text-emerald-600 bg-gray-700 rounded border-gray-600 focus:ring-emerald-500"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 bg-gray-700 rounded border-gray-600 focus:ring-emerald-500"
               required
             />
-            <label htmlFor="terms" className="ml-2 text-sm text-gray-300">
+            <label htmlFor="terms" className="ml-2 text-xs sm:text-sm text-gray-300">
               I agree to the{" "}
               <Link to="/terms" className="text-emerald-400 hover:underline">
                 Terms & Conditions
@@ -264,7 +264,7 @@ export default function RegisterPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+            className={`w-full py-2.5 sm:py-3 px-4 rounded-lg font-medium transition-all text-sm sm:text-base ${
               isLoading
                 ? "bg-teal-700 cursor-not-allowed"
                 : "bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700"
@@ -273,7 +273,7 @@ export default function RegisterPage() {
             {isLoading ? (
               <span className="flex items-center justify-center">
                 <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  className="animate-spin -ml-1 mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -301,8 +301,8 @@ export default function RegisterPage() {
         </form>
 
         {/* Footer */}
-        <div className="px-6 pb-6 text-center">
-          <p className="text-gray-400">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 text-center">
+          <p className="text-gray-400 text-sm">
             Already have an account?{" "}
             <Link
               to="/login"
