@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import ecoRoutes from './routes/ecoRoutes.js';
 
 dotenv.config();
+console.log('Environment PORT:', process.env.PORT);
 connectDB();
 
 const app = express();
