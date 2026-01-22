@@ -7,7 +7,7 @@ dotenv.config();
 const connectDB = async () => {
   try {
     // Support both MONGODB_URI and MONGO_URI for flexibility
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    const mongoUri = process.env.MONGODB_URI;
     
     if (!mongoUri) {
       throw new Error('MongoDB URI not found in environment variables');
